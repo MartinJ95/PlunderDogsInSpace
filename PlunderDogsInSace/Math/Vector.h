@@ -9,11 +9,11 @@ public:
 	Vector(const Vector& other);
 	//functions
 public:
-	inline float LengthSquare();
-	inline float Length();
-	inline Vector Normalised();
-	inline float Dot(const Vector &other);
-	inline Vector Cross(const Vector& other);
+	inline float LengthSquare() const;
+	inline float Length() const;
+	inline Vector Normalised() const;
+	inline float Dot(const Vector &other) const;
+	inline Vector Cross(const Vector& other) const;
     //assignment operators
 public:
 	inline void operator=(const Vector& other) { x = other.x; y = other.y; z = other.z; }
