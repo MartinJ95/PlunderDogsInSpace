@@ -9,7 +9,11 @@ bool Application::Init()
     return false;
 }
 
-bool Application::Run()
+void Application::Run()
 {
-    return false;
+    while (!m_graphics.ShouldWindowClose())
+    {
+        m_graphics.Clear();
+        m_graphics.Display();
+    }
 }
