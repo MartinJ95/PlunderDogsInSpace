@@ -1,5 +1,6 @@
 #include "Graphics.h"
 #include "GLFW/glfw3.h"
+#include "GLFW/glfw3native.h"
 
 Graphics::Graphics() : m_screenWidth(1280.f), m_screenHeight(720.f)
 {
@@ -28,7 +29,13 @@ void GLGraphics::Init()
 {
 	glfwInit();
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	glfwCreateWindow(m_screenWidth, m_screenHeight, "testing", nullptr, nullptr);
+
+	glfwMakeContextCurrent(m_window);
 }
 
 void GLGraphics::SetCallbacks()
@@ -46,7 +53,7 @@ bool GLGraphics::ShouldWindowClose()
 
 void GLGraphics::Clear()
 {
-	//glClearColor(0.1f, 0.5f, 0.1f, 1.f);
+	glClearColor(0.1f, 0.5f, 0.1f, 1.f);
 }
 
 void GLGraphics::Display()
