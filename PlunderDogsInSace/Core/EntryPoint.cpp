@@ -6,4 +6,7 @@ extern Application* EntryApp();
 int main()
 {
 	Application* app = EntryApp();
+	app->Init();
+	app->Run();
+	delete app;
 }
