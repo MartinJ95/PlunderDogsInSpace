@@ -46,10 +46,14 @@ bool GLGraphics::ShouldWindowClose()
 
 void GLGraphics::Clear()
 {
-	glClearColor(0.1f, 0.5f, 0.1f, 1.f);
+	//glClearColor(0.1f, 0.5f, 0.1f, 1.f);
 }
 
 void GLGraphics::Display()
 {
 	glfwSwapBuffers(m_window);
+}
+
+NullGraphics::NullGraphics() : Graphics()
+{
 }

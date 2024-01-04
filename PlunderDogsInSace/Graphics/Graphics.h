@@ -1,4 +1,7 @@
 #pragma once
+
+struct GLFWwindow;
+
 class Graphics
 {
 public:
@@ -15,6 +18,19 @@ protected:
 	float m_screenWidth, m_screenHeight;
 };
 
+class NullGraphics : public Graphics
+{
+public:
+	NullGraphics();
+public:
+	virtual void Init() override final {}
+	virtual void SetCallbacks() override final {}
+	virtual void ResizeScreen() override final {}
+	virtual bool ShouldWindowClose() override final { return true; }
+	virtual void Clear() override final {}
+	virtual void Display() override final {}
+};
+
 class GLGraphics : public Graphics
 {
 public:
@@ -22,12 +38,12 @@ public:
 	GLGraphics(float ScreenWidth, float ScreenHeight);
 	~GLGraphics();
 public:
-	virtual void Init() override;
-	virtual void SetCallbacks() override;
-	virtual void ResizeScreen() override;
-	virtual bool ShouldWindowClose() override;
-	virtual void Clear() override;
-	virtual void Display() override;
+	virtual void Init() override final;
+	virtual void SetCallbacks() override final;
+	virtual void ResizeScreen() override final;
+	virtual bool ShouldWindowClose() override final;
+	virtual void Clear() override final;
+	virtual void Display() override final;
 public:
 	GLFWwindow* m_window;
 };
