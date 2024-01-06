@@ -1,7 +1,7 @@
 #pragma once
 #include "../Graphics/Graphics.h"
 #ifdef OpenGL
-typedef GLGraphics DefaultGraphics
+typedef GLGraphics DefaultGraphics;
 #else
 typedef NullGraphics DefaultGraphics;
 #endif // !OpenGL

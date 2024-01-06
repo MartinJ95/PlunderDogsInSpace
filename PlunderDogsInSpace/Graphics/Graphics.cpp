@@ -1,6 +1,12 @@
 #include "Graphics.h"
 #include "GLFW/glfw3.h"
 #include "GLFW/glfw3native.h"
+#include <iostream>
+
+static void glfwError(int id, const char* description)
+{
+	std::cout << description << std::endl;
+}
 
 Graphics::Graphics() : m_screenWidth(1280.f), m_screenHeight(720.f)
 {
@@ -20,22 +26,34 @@ GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenW
 
 GLGraphics::~GLGraphics()
 {
-	glfwDestroyWindow(m_window);
+	if (m_window)
+	{
+		glfwDestroyWindow(m_window);
+	}
 
 	glfwTerminate();
 }
 
-void GLGraphics::Init()
+bool GLGraphics::Init()
 {
-	glfwInit();
+	glfwSetErrorCallback(&glfwError);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	if (!glfwInit())
+		return false;
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	glfwCreateWindow(m_screenWidth, m_screenHeight, "testing", nullptr, nullptr);
+	m_window = glfwCreateWindow(m_screenWidth, m_screenHeight, "testing", nullptr, nullptr);
+	if (!m_window)
+	{
+		return false;
+	}
 
 	glfwMakeContextCurrent(m_window);
+
+	return true;
 }
 
 void GLGraphics::SetCallbacks()
@@ -53,12 +71,18 @@ bool GLGraphics::ShouldWindowClose()
 
 void GLGraphics::Clear()
 {
-	glClearColor(0.1f, 0.5f, 0.1f, 1.f);
+	glClearColor(0.2f, 0.2f, 0.6f, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLGraphics::Display()
 {
 	glfwSwapBuffers(m_window);
+}
+
+void GLGraphics::PollEvents()
+{
+	glfwPollEvents();
 }
 
 NullGraphics::NullGraphics() : Graphics()

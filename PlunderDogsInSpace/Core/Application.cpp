@@ -6,7 +6,7 @@ Application::Application()
 
 bool Application::Init()
 {
-    return false;
+    return m_graphics.Init();
 }
 
 void Application::Run()
@@ -15,5 +15,6 @@ void Application::Run()
     {
         m_graphics.Clear();
         m_graphics.Display();
+        m_graphics.PollEvents();
     }
 }
