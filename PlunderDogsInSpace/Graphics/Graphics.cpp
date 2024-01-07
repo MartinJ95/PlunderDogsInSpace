@@ -1,11 +1,7 @@
 #include "Graphics.h"
-#include "GLFW/glfw3.h"
-#include "GLFW/glfw3native.h"
-#include "glad/glad.h"
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
 static void glfwError(int id, const char* description)
 {
@@ -20,11 +16,11 @@ Graphics::Graphics(float ScreenWidth, float ScreenHeight) : m_screenWidth(Screen
 {
 }
 
-GLGraphics::GLGraphics() : Graphics()
+GLGraphics::GLGraphics() : Graphics(), m_window(nullptr)
 {
 }
 
-GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight)
+GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr)
 {
 }
 
@@ -46,8 +42,9 @@ bool GLGraphics::Init()
 		return false;
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
 	m_window = glfwCreateWindow(m_screenWidth, m_screenHeight, "testing", nullptr, nullptr);
 	if (!m_window)
@@ -56,6 +53,14 @@ bool GLGraphics::Init()
 	}
 
 	glfwMakeContextCurrent(m_window);
+
+	// glad: load all OpenGL function pointers
+	// ---------------------------------------
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return false;
+	}
 
 	return true;
 }
@@ -205,4 +210,63 @@ void GLShader::CheckCompileErrors(const unsigned int shader, const std::string&&
 			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
 		}
 	}
+}
+
+GLModel::GLModel(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Indices) : m_vertices(std::move(Vertices)), m_elements(std::move(Indices)),
+	VertexBufferObject(UINT32_MAX), VertexArrayObject(UINT32_MAX), ElementBufferObject(UINT32_MAX)
+{
+
+}
+
+GLModel::GLModel(const GLModel& other) : m_vertices(other.m_vertices), m_elements(other.m_elements),
+VertexBufferObject(other.VertexBufferObject), VertexArrayObject(other.VertexArrayObject), ElementBufferObject(other.ElementBufferObject)
+{
+}
+
+GLModel::GLModel(GLModel&& other) : m_vertices(std::move(other.m_vertices)), m_elements(std::move(other.m_elements)),
+VertexBufferObject(other.VertexBufferObject), VertexArrayObject(other.VertexArrayObject), ElementBufferObject(other.ElementBufferObject)
+{
+	other.VertexBufferObject = UINT32_MAX;
+	other.VertexArrayObject = UINT32_MAX;
+	other.ElementBufferObject = UINT32_MAX;
+}
+
+void GLModel::Render(GLShader& s)
+{
+	glBindVertexArray(VertexArrayObject);
+	// draw mesh
+	glBindVertexArray(VertexArrayObject);
+	glDrawElements(GL_TRIANGLES, m_elements.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void GLModel::SetUpMesh()
+{
+	glGenVertexArrays(1, &VertexArrayObject);
+	glGenBuffers(1, &VertexBufferObject);
+	glGenBuffers(1, &ElementBufferObject);
+
+	glBindVertexArray(VertexArrayObject);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_elements.size() * sizeof(unsigned int),
+		&m_elements[0], GL_STATIC_DRAW);
+
+	// vertex positions
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	// vertex normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	// vertex color
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	//vertex trexcoord
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	glBindVertexArray(0);
 }

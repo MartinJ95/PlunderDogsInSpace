@@ -1,6 +1,37 @@
 #pragma once
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+#include "glm/glm/glm.hpp"
+#include <vector>
+#include <iostream>
 
 struct GLFWwindow;
+struct GLShader;
+
+struct Vertex
+{
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec3 color;
+	glm::vec2 texCoords;
+};
+
+struct GLModel
+{
+public:
+	GLModel(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Indices);
+	GLModel(const GLModel& other);
+	GLModel(GLModel&& other);
+
+public:
+	std::vector<Vertex> m_vertices;
+	std::vector<unsigned int> m_elements;
+public:
+	void Render(GLShader &s);
+	void SetUpMesh();
+private:
+	unsigned int VertexBufferObject, VertexArrayObject, ElementBufferObject;
+};
 
 struct GLShader
 {

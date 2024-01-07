@@ -139,6 +139,7 @@
     <ClInclude Include="Graphics.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Dependencies\Include\src\glad.c" />
     <ClCompile Include="Graphics.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
