@@ -2,6 +2,24 @@
 
 struct GLFWwindow;
 
+struct GLShader
+{
+public:
+	GLShader(const char* VertexPath, const char* FragmentPath);
+	GLShader(const GLShader& other);
+	GLShader(GLShader&& other);
+	~GLShader();
+public:
+	unsigned int ID;
+public:
+	void Use();
+	void SetFloat(const std::string& name, float value) const;
+	void SetBool(const std::string& name, bool value) const;
+	void SetInt(const std::string& name, int value) const;
+private:
+	void CheckCompileErrors(const unsigned int shader, const std::string&& type) const;
+};
+
 class Graphics
 {
 public:
