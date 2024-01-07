@@ -212,18 +212,18 @@ void GLShader::CheckCompileErrors(const unsigned int shader, const std::string&&
 	}
 }
 
-GLModel::GLModel(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Indices) : m_vertices(std::move(Vertices)), m_elements(std::move(Indices)),
+GLModel::GLModel(Model&& Model) : m_model(std::move(Model)),
 	VertexBufferObject(UINT32_MAX), VertexArrayObject(UINT32_MAX), ElementBufferObject(UINT32_MAX)
 {
 
 }
 
-GLModel::GLModel(const GLModel& other) : m_vertices(other.m_vertices), m_elements(other.m_elements),
+GLModel::GLModel(const GLModel& other) : m_model(other.m_model),
 VertexBufferObject(other.VertexBufferObject), VertexArrayObject(other.VertexArrayObject), ElementBufferObject(other.ElementBufferObject)
 {
 }
 
-GLModel::GLModel(GLModel&& other) : m_vertices(std::move(other.m_vertices)), m_elements(std::move(other.m_elements)),
+GLModel::GLModel(GLModel&& other) : m_model(std::move(other.m_model)),
 VertexBufferObject(other.VertexBufferObject), VertexArrayObject(other.VertexArrayObject), ElementBufferObject(other.ElementBufferObject)
 {
 	other.VertexBufferObject = UINT32_MAX;
@@ -236,7 +236,7 @@ void GLModel::Render(GLShader& s)
 	glBindVertexArray(VertexArrayObject);
 	// draw mesh
 	glBindVertexArray(VertexArrayObject);
-	glDrawElements(GL_TRIANGLES, m_elements.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_model.elements.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
@@ -249,11 +249,11 @@ void GLModel::SetUpMesh()
 	glBindVertexArray(VertexArrayObject);
 	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
 
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_model.vertices.size() * sizeof(Vertex), &m_model.vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_elements.size() * sizeof(unsigned int),
-		&m_elements[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.elements.size() * sizeof(unsigned int),
+		&m_model.elements[0], GL_STATIC_DRAW);
 
 	// vertex positions
 	glEnableVertexAttribArray(0);
@@ -269,4 +269,19 @@ void GLModel::SetUpMesh()
 	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
 	glBindVertexArray(0);
+}
+
+Model::Model(std::vector<Vertex> Vertices, std::vector<unsigned int> Elements) :
+	vertices(Vertices), elements(Elements)
+{
+}
+
+Model::Model(const Model& other) :
+	vertices(other.vertices), elements(other.elements)
+{
+}
+
+Model::Model(Model&& other) :
+	vertices(std::move(other.vertices)), elements(other.elements)
+{
 }

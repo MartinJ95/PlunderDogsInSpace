@@ -16,20 +16,30 @@ struct Vertex
 	glm::vec2 texCoords;
 };
 
-struct GLModel
+struct Model
 {
 public:
-	GLModel(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Indices);
+	Model(std::vector<Vertex> Vertices, std::vector<unsigned int> Elements);
+	Model(const Model& other);
+	Model(Model&& other);
+	friend class GLModel;
+protected:
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> elements;
+};
+
+class GLModel
+{
+public:
+	GLModel(Model&& Model);
 	GLModel(const GLModel& other);
 	GLModel(GLModel&& other);
-
-public:
-	std::vector<Vertex> m_vertices;
-	std::vector<unsigned int> m_elements;
 public:
 	void Render(GLShader &s);
 	void SetUpMesh();
-private:
+protected:
+	Model m_model;
+protected:
 	unsigned int VertexBufferObject, VertexArrayObject, ElementBufferObject;
 };
 
@@ -96,6 +106,7 @@ public:
 	virtual void Clear() override final;
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
-public:
+protected:
 	GLFWwindow* m_window;
+	std::vector<GLModel> m_models;
 };
