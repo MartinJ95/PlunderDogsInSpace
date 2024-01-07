@@ -2,11 +2,26 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "glm/glm/glm.hpp"
+#include "glm/glm/gtc/quaternion.hpp"
 #include <vector>
 #include <iostream>
+#include <unordered_map>
 
 struct GLFWwindow;
 struct GLShader;
+
+class Camera
+{
+public:
+	Camera();
+public:
+	glm::vec3 GetPos() { return m_position; }
+	glm::quat GetRotation() { return m_rotation; }
+	glm::vec3 GetViewDir() { return glm::vec3(0, 0, 1) * m_rotation; }
+protected:
+	glm::vec3 m_position;
+	glm::quat m_rotation;
+};
 
 struct Vertex
 {
@@ -46,6 +61,7 @@ protected:
 struct GLShader
 {
 public:
+	GLShader();
 	GLShader(const char* VertexPath, const char* FragmentPath);
 	GLShader(const GLShader& other);
 	GLShader(GLShader&& other);
@@ -53,6 +69,8 @@ public:
 public:
 	unsigned int ID;
 public:
+	void operator=(const GLShader& other) { ID = other.ID; }
+	void operator=(GLShader&& other) { ID = other.ID; other.ID = UINT32_MAX; }
 	void Use();
 	void SetFloat(const std::string& name, float value) const;
 	void SetBool(const std::string& name, bool value) const;
@@ -72,6 +90,7 @@ public:
 	virtual void ResizeScreen() = 0;
 	virtual bool ShouldWindowClose() = 0;
 	virtual void Clear() = 0;
+	virtual void Render(unsigned int ID) = 0;
 	virtual void Display() = 0;
 	virtual void PollEvents() = 0;
 protected:
@@ -88,6 +107,7 @@ public:
 	virtual void ResizeScreen() override final {}
 	virtual bool ShouldWindowClose() override final { return true; }
 	virtual void Clear() override final {}
+	virtual void Render(unsigned int ID) override final {}
 	virtual void Display() override final {}
 	virtual void PollEvents() override final {}
 };
@@ -104,9 +124,12 @@ public:
 	virtual void ResizeScreen() override final;
 	virtual bool ShouldWindowClose() override final;
 	virtual void Clear() override final;
+	virtual void Render(unsigned int ID) override final;
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
 protected:
 	GLFWwindow* m_window;
-	std::vector<GLModel> m_models;
+	GLShader m_shader;
+	Camera m_cam;
+	std::unordered_map<unsigned int, GLModel> m_models;
 };

@@ -16,12 +16,16 @@ Graphics::Graphics(float ScreenWidth, float ScreenHeight) : m_screenWidth(Screen
 {
 }
 
-GLGraphics::GLGraphics() : Graphics(), m_window(nullptr)
+GLGraphics::GLGraphics() : Graphics(), m_window(nullptr), m_shader(), m_cam(), m_models(0)
 {
+	Init();
+	m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
 }
 
-GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr)
+GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr),m_shader(), m_cam(), m_models(0)
 {
+	Init();
+	m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
 }
 
 GLGraphics::~GLGraphics()
@@ -84,6 +88,14 @@ void GLGraphics::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void GLGraphics::Render(unsigned int ID)
+{
+	if (m_models.find(ID) == m_models.end())
+		return;
+
+	m_models.find(ID)->second.Render(m_shader);
+}
+
 void GLGraphics::Display()
 {
 	glfwSwapBuffers(m_window);
@@ -95,6 +107,10 @@ void GLGraphics::PollEvents()
 }
 
 NullGraphics::NullGraphics() : Graphics()
+{
+}
+
+GLShader::GLShader()
 {
 }
 
@@ -283,5 +299,9 @@ Model::Model(const Model& other) :
 
 Model::Model(Model&& other) :
 	vertices(std::move(other.vertices)), elements(other.elements)
+{
+}
+
+Camera::Camera() : m_position(glm::vec3(0.f, 0.f, 0.f)), m_rotation()
 {
 }
