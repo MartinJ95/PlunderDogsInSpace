@@ -27,4 +27,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="default2DShader.fs" />
+    <None Include="default2DShader.vs" />
+    <None Include="default3DShader.fs" />
+    <None Include="default3DShader.vs" />
+  </ItemGroup>
 </Project>
