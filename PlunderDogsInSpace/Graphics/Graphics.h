@@ -3,6 +3,8 @@
 #include "GLFW/glfw3.h"
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/quaternion.hpp"
+#include <glm/glm/gtc/type_ptr.hpp>
+#include <glm/glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <iostream>
 #include <unordered_map>
@@ -75,6 +77,8 @@ public:
 	void SetFloat(const std::string& name, float value) const;
 	void SetBool(const std::string& name, bool value) const;
 	void SetInt(const std::string& name, int value) const;
+	void SetVec3(const std::string& name, const glm::vec3& value) const;
+	void SetMat4(const std::string& name, const glm::mat4& value) const;
 private:
 	void CheckCompileErrors(const unsigned int shader, const std::string&& type) const;
 };
@@ -112,12 +116,21 @@ public:
 	virtual void PollEvents() override final {}
 };
 
+class GLGraphics;
+
+struct GLUniformSetter
+{
+	void SetRender2D(GLGraphics* Graphics);
+	void SetRender3D(GLGraphics* Graphics);
+};
+
 class GLGraphics : public Graphics
 {
 public:
 	GLGraphics();
 	GLGraphics(float ScreenWidth, float ScreenHeight);
 	~GLGraphics();
+	friend struct GLUniformSetter;
 public:
 	virtual bool Init() override final;
 	virtual void SetCallbacks() override final;

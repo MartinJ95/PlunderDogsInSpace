@@ -204,6 +204,16 @@ void GLShader::SetInt(const std::string& name, int value) const
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
+void GLShader::SetVec3(const std::string& name, const glm::vec3& value) const
+{
+	glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
+}
+
+void GLShader::SetMat4(const std::string& name, const glm::mat4& value) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, false, glm::value_ptr(value));
+}
+
 void GLShader::CheckCompileErrors(const unsigned int shader, const std::string&& type) const
 {
 	int success;
@@ -304,4 +314,16 @@ Model::Model(Model&& other) :
 
 Camera::Camera() : m_position(glm::vec3(0.f, 0.f, 0.f)), m_rotation()
 {
+}
+
+void GLUniformSetter::SetRender2D(GLGraphics* Graphics)
+{
+	
+}
+
+void GLUniformSetter::SetRender3D(GLGraphics* Graphics)
+{
+	Graphics->m_shader.Use();
+	Graphics->m_shader.SetVec3("cameraPosition", Graphics->m_cam.GetPos());
+	Graphics->m_shader.SetVec3("ambientLighting", glm::vec3(1.f, 1.f, 1.f));
 }
