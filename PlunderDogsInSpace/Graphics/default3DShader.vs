@@ -8,6 +8,7 @@ layout (location = 3) in vec2 vertexTexCoords;
 out vec2 TexCoord;
 out vec3 Position;
 out vec3 Normal;
+out vec3 Color;
 out vec4 gl_Position;
 
 uniform mat4 model_xform;
@@ -21,5 +22,6 @@ void main()
 	//gl_Position = vec4(vertexPosition, 1);
 	Position = vec4(model_xform * vec4(vertexPosition, 1.0)).xyz;
 	TexCoord = vertexTexCoords;
+	Color = vertexColor;
 	Normal = normalMatrix * vertexNormal;
 }

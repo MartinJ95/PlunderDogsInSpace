@@ -19,6 +19,7 @@ struct spotLight
 in vec2 TexCoord;
 in vec3 Position;
 in vec3 Normal;
+in vec3 Color;
 
 uniform sampler2D Texture;
 uniform pointLight pointLights[100];
@@ -115,4 +116,5 @@ void main()
 	gl_FragColor = vec4(reflectedLight, 1.0);
 	//gl_FragColor = vec4(vec3(1, 1, 1) * normal, 1.0);
 	//gl_FragColor = texture(Texture, TexCoord).xyz;
+	gl_FragColor = vec4(Color, 1.0);
 }
