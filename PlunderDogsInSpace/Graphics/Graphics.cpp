@@ -8,21 +8,21 @@ static void glfwError(int id, const char* description)
 	std::cout << description << std::endl;
 }
 
-Graphics::Graphics() : m_screenWidth(1280.f), m_screenHeight(720.f)
+Graphics::Graphics() : m_screenWidth(1280.f), m_screenHeight(720.f), m_cam()
 {
 }
 
-Graphics::Graphics(float ScreenWidth, float ScreenHeight) : m_screenWidth(ScreenWidth), m_screenHeight(m_screenHeight)
+Graphics::Graphics(float ScreenWidth, float ScreenHeight) : m_screenWidth(ScreenWidth), m_screenHeight(m_screenHeight), m_cam()
 {
 }
 
-GLGraphics::GLGraphics() : Graphics(), m_window(nullptr), m_shader(), m_cam(), m_models(0)
+GLGraphics::GLGraphics() : Graphics(), m_window(nullptr), m_shader(), m_models(0)
 {
 	Init();
 	m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
 }
 
-GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr),m_shader(), m_cam(), m_models(0)
+GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr),m_shader(), m_models(0)
 {
 	Init();
 	m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
@@ -66,6 +66,10 @@ bool GLGraphics::Init()
 		return false;
 	}
 
+	GLModelLoading modelLoader;
+
+	modelLoader.LoadBaseModels(m_models);
+
 	return true;
 }
 
@@ -84,11 +88,11 @@ bool GLGraphics::ShouldWindowClose()
 
 void GLGraphics::Clear()
 {
-	glClearColor(0.2f, 0.2f, 0.6f, 1.f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GLGraphics::Render(unsigned int ID)
+void GLGraphics::Render(const unsigned int ID, const bool Is3D, const glm::mat4& ModelXForm)
 {
 	if (m_models.find(ID) == m_models.end())
 		return;
@@ -189,27 +193,27 @@ void GLShader::Use()
 	glUseProgram(ID);
 }
 
-void GLShader::SetFloat(const std::string& name, float value) const
+void GLUniformSetter::SetFloat(const int ID, const std::string& name, float value) const
 {
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void GLShader::SetBool(const std::string& name, bool value) const
+void GLUniformSetter::SetBool(const int ID, const std::string& name, bool value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
 
-void GLShader::SetInt(const std::string& name, int value) const
+void GLUniformSetter::SetInt(const int ID, const std::string& name, int value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void GLShader::SetVec3(const std::string& name, const glm::vec3& value) const
+void GLUniformSetter::SetVec3(const int ID, const std::string& name, const glm::vec3& value) const
 {
 	glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
 }
 
-void GLShader::SetMat4(const std::string& name, const glm::mat4& value) const
+void GLUniformSetter::SetMat4(const int ID, const std::string& name, const glm::mat4& value) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, false, glm::value_ptr(value));
 }
@@ -297,7 +301,7 @@ void GLModel::SetUpMesh()
 	glBindVertexArray(0);
 }
 
-Model::Model(std::vector<Vertex> Vertices, std::vector<unsigned int> Elements) :
+Model::Model(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Elements) :
 	vertices(Vertices), elements(Elements)
 {
 }
@@ -316,14 +320,56 @@ Camera::Camera() : m_position(glm::vec3(0.f, 0.f, 0.f)), m_rotation()
 {
 }
 
-void GLUniformSetter::SetRender2D(GLGraphics* Graphics)
+void GLShader::SetRender2D()
 {
-	
+	Use();
 }
 
-void GLUniformSetter::SetRender3D(GLGraphics* Graphics)
+void GLShader::SetRender3D(glm::vec3& CamPos)
 {
-	Graphics->m_shader.Use();
-	Graphics->m_shader.SetVec3("cameraPosition", Graphics->m_cam.GetPos());
-	Graphics->m_shader.SetVec3("ambientLighting", glm::vec3(1.f, 1.f, 1.f));
+	Use();
+	m_uniforms.SetVec3(ID, "cameraPosition", CamPos);
+	m_uniforms.SetVec3(ID, "ambientLighting", glm::vec3(1.f, 1.f, 1.f));
+}
+
+void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& Models)
+{
+	LoadPlane(Models);
+}
+
+void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models)
+{
+	std::vector<Vertex> verts;
+	std::vector<unsigned int> elements;
+
+	verts.emplace_back(
+		glm::vec3(1.f, 0, -1.f), //pos
+		glm::vec3(0.f, 1.f, 0.f), //norm
+		glm::vec3(1.f, 1.f, 1.f), //color
+		glm::vec2(0.f, 0.f)); //texcoord
+
+	verts.emplace_back(
+		glm::vec3(1.f, 0, 1.f), //pos
+		glm::vec3(0.f, 1.f, 0.f), //norm
+		glm::vec3(1.f, 1.f, 1.f), //color
+		glm::vec2(0.f, 0.f)); //texcoord
+
+	verts.emplace_back(
+		glm::vec3(-1.f, 0, -1.f), //pos
+		glm::vec3(0.f, 1.f, 0.f), //norm
+		glm::vec3(1.f, 1.f, 1.f), //color
+		glm::vec2(0.f, 0.f)); //texcoord
+
+	verts.emplace_back(
+		glm::vec3(-1.f, 0, 1.f), //pos
+		glm::vec3(0.f, 1.f, 0.f), //norm
+		glm::vec3(1.f, 1.f, 1.f), //color
+		glm::vec2(0.f, 0.f)); //texcoord
+
+	elements = std::vector<unsigned int>{ 0, 1, 2, 2, 1, 3 };
+
+	Model m(std::move(verts), std::move(elements));
+
+	Models.insert(std::pair<unsigned int, GLModel>(0, std::move(GLModel(std::move(m)))));
+	//m_models.emplace(std::pair<unsigned int, GLModel>(0, std::move(m)));
 }

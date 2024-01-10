@@ -27,6 +27,9 @@ protected:
 
 struct Vertex
 {
+	Vertex(const glm::vec3& Position, const glm::vec3& Normal, const glm::vec3& Color, const glm::vec2& TexCoords) :
+		position(Position), normal(Normal), color(Color), texCoords(TexCoords)
+	{}
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec3 color;
@@ -36,7 +39,7 @@ struct Vertex
 struct Model
 {
 public:
-	Model(std::vector<Vertex> Vertices, std::vector<unsigned int> Elements);
+	Model(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Elements);
 	Model(const Model& other);
 	Model(Model&& other);
 	friend class GLModel;
@@ -60,6 +63,15 @@ protected:
 	unsigned int VertexBufferObject, VertexArrayObject, ElementBufferObject;
 };
 
+struct GLUniformSetter
+{
+	inline void SetFloat(const int ID, const std::string& name, float value) const;
+	inline void SetBool(const int ID, const std::string& name, bool value) const;
+	inline void SetInt(const int ID, const std::string& name, int value) const;
+	inline void SetVec3(const int ID, const std::string& name, const glm::vec3& value) const;
+	inline void SetMat4(const int ID, const std::string& name, const glm::mat4& value) const;
+};
+
 struct GLShader
 {
 public:
@@ -67,6 +79,7 @@ public:
 	GLShader(const char* VertexPath, const char* FragmentPath);
 	GLShader(const GLShader& other);
 	GLShader(GLShader&& other);
+	inline int GetID() const { return ID; }
 	~GLShader();
 public:
 	unsigned int ID;
@@ -74,11 +87,10 @@ public:
 	void operator=(const GLShader& other) { ID = other.ID; }
 	void operator=(GLShader&& other) { ID = other.ID; other.ID = UINT32_MAX; }
 	void Use();
-	void SetFloat(const std::string& name, float value) const;
-	void SetBool(const std::string& name, bool value) const;
-	void SetInt(const std::string& name, int value) const;
-	void SetVec3(const std::string& name, const glm::vec3& value) const;
-	void SetMat4(const std::string& name, const glm::mat4& value) const;
+	void SetRender2D();
+	void SetRender3D(glm::vec3& CamPos);
+public:
+	GLUniformSetter m_uniforms;
 private:
 	void CheckCompileErrors(const unsigned int shader, const std::string&& type) const;
 };
@@ -94,11 +106,12 @@ public:
 	virtual void ResizeScreen() = 0;
 	virtual bool ShouldWindowClose() = 0;
 	virtual void Clear() = 0;
-	virtual void Render(unsigned int ID) = 0;
+	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) = 0;
 	virtual void Display() = 0;
 	virtual void PollEvents() = 0;
 protected:
 	float m_screenWidth, m_screenHeight;
+	Camera m_cam;
 };
 
 class NullGraphics : public Graphics
@@ -111,17 +124,17 @@ public:
 	virtual void ResizeScreen() override final {}
 	virtual bool ShouldWindowClose() override final { return true; }
 	virtual void Clear() override final {}
-	virtual void Render(unsigned int ID) override final {}
+	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final {}
 	virtual void Display() override final {}
 	virtual void PollEvents() override final {}
 };
 
-class GLGraphics;
-
-struct GLUniformSetter
+struct GLModelLoading
 {
-	void SetRender2D(GLGraphics* Graphics);
-	void SetRender3D(GLGraphics* Graphics);
+public:
+	void LoadBaseModels(std::unordered_map<unsigned int, GLModel>& Models);
+private:
+	void LoadPlane(std::unordered_map<unsigned int, GLModel>& Models);
 };
 
 class GLGraphics : public Graphics
@@ -130,19 +143,19 @@ public:
 	GLGraphics();
 	GLGraphics(float ScreenWidth, float ScreenHeight);
 	~GLGraphics();
-	friend struct GLUniformSetter;
 public:
 	virtual bool Init() override final;
 	virtual void SetCallbacks() override final;
 	virtual void ResizeScreen() override final;
 	virtual bool ShouldWindowClose() override final;
 	virtual void Clear() override final;
-	virtual void Render(unsigned int ID) override final;
+	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final;
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
+	GLShader GetShader() { return m_shader; }
 protected:
 	GLFWwindow* m_window;
 	GLShader m_shader;
-	Camera m_cam;
 	std::unordered_map<unsigned int, GLModel> m_models;
+	std::vector<GLShader> m_shaders;
 };
