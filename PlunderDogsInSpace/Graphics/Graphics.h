@@ -42,8 +42,17 @@ public:
 	Model(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Elements);
 	Model(const Model& other);
 	Model(Model&& other);
-	friend class GLModel;
-protected:
+	void operator=(const Model& other)
+	{
+		vertices = other.vertices;
+		elements = other.elements;
+	}
+	void operator=(Model&& other)
+	{
+		vertices = std::move(other.vertices);
+		elements = std::move(other.elements);
+	}
+public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> elements;
 };
@@ -57,6 +66,20 @@ public:
 public:
 	void Render(GLShader &s);
 	void SetUpMesh();
+	void operator=(const GLModel& other)
+	{
+		m_model = other.m_model;
+		VertexBufferObject = other.VertexBufferObject;
+		VertexArrayObject = other.VertexArrayObject;
+		ElementBufferObject = other.ElementBufferObject;
+	}
+	void operator=(GLModel&& other)
+	{
+		m_model = std::move(other.m_model);
+		std::swap(VertexBufferObject, other.VertexBufferObject);
+		std::swap(VertexArrayObject, other.VertexArrayObject);
+		std::swap(ElementBufferObject, other.ElementBufferObject);
+	}
 protected:
 	Model m_model;
 protected:
@@ -152,10 +175,10 @@ public:
 	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final;
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
-	GLShader GetShader() { return m_shader; }
+	GLShader& GetShader(const int ID) { return m_shaders.at(ID); }
 protected:
 	GLFWwindow* m_window;
 	GLShader m_shader;
 	std::unordered_map<unsigned int, GLModel> m_models;
-	std::vector<GLShader> m_shaders;
+	std::unordered_map<unsigned int, GLShader> m_shaders;
 };

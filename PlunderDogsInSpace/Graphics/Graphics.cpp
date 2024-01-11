@@ -16,16 +16,18 @@ Graphics::Graphics(float ScreenWidth, float ScreenHeight) : m_screenWidth(Screen
 {
 }
 
-GLGraphics::GLGraphics() : Graphics(), m_window(nullptr), m_shader(), m_models(0)
+GLGraphics::GLGraphics() : Graphics(), m_window(nullptr), m_models(0)
 {
 	Init();
-	m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
+	//m_shaders.emplace(0, GLShader( "default3DShader.vs", "default3DShader.fs" ));
+	//m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
 }
 
-GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr),m_shader(), m_models(0)
+GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr), m_models(), m_shaders()
 {
 	Init();
-	m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
+	//m_shaders.emplace(0, GLShader("default3DShader.vs", "default3DShader.fs"));
+	//m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
 }
 
 GLGraphics::~GLGraphics()
@@ -96,6 +98,9 @@ void GLGraphics::Render(const unsigned int ID, const bool Is3D, const glm::mat4&
 {
 	if (m_models.find(ID) == m_models.end())
 		return;
+
+	if (Is3D)
+		m_shaders.find(ID)->second.m_uniforms.SetMat4(m_shaders.find(ID)->second.GetID(), "model_xform", ModelXForm);
 
 	m_models.find(ID)->second.Render(m_shader);
 }
@@ -312,7 +317,7 @@ Model::Model(const Model& other) :
 }
 
 Model::Model(Model&& other) :
-	vertices(std::move(other.vertices)), elements(other.elements)
+	vertices(std::move(other.vertices)), elements(std::move(other.elements))
 {
 }
 
@@ -370,6 +375,12 @@ void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models
 
 	Model m(std::move(verts), std::move(elements));
 
-	Models.insert(std::pair<unsigned int, GLModel>(0, std::move(GLModel(std::move(m)))));
+	GLModel glModel(std::move(m));
+
+	//Models[0] = std::move(glModel);
+
+	//Models.emplace(0, GLModel(std::move(m)));
+	//Models.insert(0, GLModel(std::move(m)));
+	//Models.insert(std::pair<unsigned int, GLModel>(0, std::move(GLModel(std::move(m)))));
 	//m_models.emplace(std::pair<unsigned int, GLModel>(0, std::move(m)));
 }
