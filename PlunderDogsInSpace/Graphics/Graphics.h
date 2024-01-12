@@ -2,7 +2,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "glm/glm/glm.hpp"
-#include "glm/glm/gtc/quaternion.hpp"
+#include "glm/glm/gtc/quaternion.hpp" 
 #include <glm/glm/gtc/type_ptr.hpp>
 #include <glm/glm/gtc/matrix_transform.hpp>
 #include <vector>
@@ -17,9 +17,17 @@ class Camera
 public:
 	Camera();
 public:
-	glm::vec3 GetPos() { return m_position; }
-	glm::quat GetRotation() { return m_rotation; }
-	glm::vec3 GetViewDir() { return glm::vec3(0, 0, 1) * m_rotation; }
+	glm::vec3 GetPos() const { return m_position; }
+	void SetPos(const glm::vec3& NewPos) { m_position = NewPos; }
+	glm::quat GetRotation() const { return m_rotation; }
+	void SetRotation(const glm::quat& NewRot) { m_rotation = NewRot; }
+	glm::vec3 GetViewDir() const 
+	{
+		glm::quat q(0.f, 0.f, 0.f, -1.f);
+		q = m_rotation * q;
+		q = q * glm::conjugate(m_rotation);
+		return glm::vec3(q.x, q.y, q.z);
+	}
 protected:
 	glm::vec3 m_position;
 	glm::quat m_rotation;
@@ -27,12 +35,12 @@ protected:
 
 struct Vertex
 {
-	Vertex(const glm::vec3& Position, const glm::vec3& Normal, const glm::vec3& Color, const glm::vec2& TexCoords) :
-		position(Position), normal(Normal), color(Color), texCoords(TexCoords)
+	Vertex(const glm::vec3& Position, const glm::vec3& Color, const glm::vec3& Normal, const glm::vec2& TexCoords) :
+		position(Position), color(Color), normal(Normal), texCoords(TexCoords)
 	{}
 	glm::vec3 position;
-	glm::vec3 normal;
 	glm::vec3 color;
+	glm::vec3 normal;
 	glm::vec2 texCoords;
 };
 
@@ -102,16 +110,17 @@ public:
 	GLShader(const char* VertexPath, const char* FragmentPath);
 	GLShader(const GLShader& other);
 	GLShader(GLShader&& other);
-	inline int GetID() const { return ID; }
+	inline unsigned int GetID() const { return ID; }
+	unsigned int DebugLocation(const unsigned int ID, const char* name);
 	~GLShader();
 public:
 	unsigned int ID;
 public:
 	void operator=(const GLShader& other) { ID = other.ID; }
 	void operator=(GLShader&& other) { ID = other.ID; other.ID = UINT32_MAX; }
-	void Use();
-	void SetRender2D();
-	void SetRender3D(glm::vec3& CamPos);
+	void Use() const;
+	void SetRender2D() const;
+	void SetRender3D(const Camera& Cam) const;
 public:
 	GLUniformSetter m_uniforms;
 private:
@@ -132,6 +141,7 @@ public:
 	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) = 0;
 	virtual void Display() = 0;
 	virtual void PollEvents() = 0;
+	Camera& GetCamera() { return m_cam; }
 protected:
 	float m_screenWidth, m_screenHeight;
 	Camera m_cam;

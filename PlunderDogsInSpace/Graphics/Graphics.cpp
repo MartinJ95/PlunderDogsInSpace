@@ -18,16 +18,10 @@ Graphics::Graphics(float ScreenWidth, float ScreenHeight) : m_screenWidth(Screen
 
 GLGraphics::GLGraphics() : Graphics(), m_window(nullptr), m_models(0)
 {
-	Init();
-	//m_shaders.emplace(0, GLShader( "default3DShader.vs", "default3DShader.fs" ));
-	//m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
 }
 
 GLGraphics::GLGraphics(float ScreenWidth, float ScreenHeight) : Graphics(ScreenWidth, ScreenHeight), m_window(nullptr), m_models(), m_shaders()
 {
-	Init();
-	//m_shaders.emplace(0, GLShader("default3DShader.vs", "default3DShader.fs"));
-	//m_shader = GLShader("default3DShader.vs", "default3DShader.fs");
 }
 
 GLGraphics::~GLGraphics()
@@ -68,9 +62,14 @@ bool GLGraphics::Init()
 		return false;
 	}
 
+	m_shaders.emplace(0, GLShader("default3DShader.vs", "default3DShader.fs"));
+
 	GLModelLoading modelLoader;
 
 	modelLoader.LoadBaseModels(m_models);
+
+	glEnable(GL_DEPTH_TEST);
+
 
 	return true;
 }
@@ -119,7 +118,7 @@ NullGraphics::NullGraphics() : Graphics()
 {
 }
 
-GLShader::GLShader()
+GLShader::GLShader() : ID(UINT32_MAX)
 {
 }
 
@@ -178,6 +177,12 @@ GLShader::GLShader(const char* VertexPath, const char* FragmentPath) : ID(UINT32
 
 GLShader::GLShader(const GLShader& other) : ID(other.ID)
 {
+
+}
+
+unsigned int GLShader::DebugLocation(const unsigned int ID, const char* name)
+{
+	return glGetUniformLocation(ID, name);
 }
 
 GLShader::GLShader(GLShader&& other) : ID(other.ID)
@@ -193,8 +198,11 @@ GLShader::~GLShader()
 	}
 }
 
-void GLShader::Use()
+void GLShader::Use() const
 {
+	if (!glIsProgram(ID))
+		return;
+
 	glUseProgram(ID);
 }
 
@@ -215,11 +223,15 @@ void GLUniformSetter::SetInt(const int ID, const std::string& name, int value) c
 
 void GLUniformSetter::SetVec3(const int ID, const std::string& name, const glm::vec3& value) const
 {
+	if (glGetUniformLocation(ID, name.c_str()) == -1)
+		return;
 	glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
 }
 
 void GLUniformSetter::SetMat4(const int ID, const std::string& name, const glm::mat4& value) const
 {
+	if (glGetUniformLocation(ID, name.c_str()) == -1)
+		return;
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, false, glm::value_ptr(value));
 }
 
@@ -293,12 +305,12 @@ void GLModel::SetUpMesh()
 	// vertex positions
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	// vertex normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	// vertex color
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	// vertex normal
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	//vertex trexcoord
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
@@ -325,16 +337,25 @@ Camera::Camera() : m_position(glm::vec3(0.f, 0.f, 0.f)), m_rotation()
 {
 }
 
-void GLShader::SetRender2D()
+void GLShader::SetRender2D() const
 {
 	Use();
 }
 
-void GLShader::SetRender3D(glm::vec3& CamPos)
+void GLShader::SetRender3D(const Camera& Cam) const
 {
 	Use();
-	m_uniforms.SetVec3(ID, "cameraPosition", CamPos);
+	m_uniforms.SetVec3(ID, "cameraPosition", Cam.GetPos());
 	m_uniforms.SetVec3(ID, "ambientLighting", glm::vec3(1.f, 1.f, 1.f));
+	//width = 1280, height = 720, fov = 90
+	glm::mat4 projection = glm::perspective(glm::radians(90.f), 1280.f / 720.f, 0.1f, 100.0f);
+	m_uniforms.SetMat4(ID, "projection", projection);
+	glm::vec3 camPos = Cam.GetPos();
+	glm::vec3 up(0.f, 1.f, 0.f);
+	glm::vec3 camDir = Cam.GetViewDir();
+	glm::mat4 view = glm::lookAt(camPos, camPos + camDir, up);
+	//glm::mat4 view = glm::lookAt(camPos, glm::vec3(0.f, 0.f, 0.f), up);
+	m_uniforms.SetMat4(ID, "view", view);
 }
 
 void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& Models)
@@ -349,33 +370,37 @@ void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models
 
 	verts.emplace_back(
 		glm::vec3(1.f, 0, -1.f), //pos
-		glm::vec3(0.f, 1.f, 0.f), //norm
 		glm::vec3(1.f, 1.f, 1.f), //color
-		glm::vec2(0.f, 0.f)); //texcoord
+		glm::vec3(0.f, 1.f, 0.f), //norm
+		glm::vec2(1.f, 0.f)); //texcoord
 
 	verts.emplace_back(
 		glm::vec3(1.f, 0, 1.f), //pos
-		glm::vec3(0.f, 1.f, 0.f), //norm
 		glm::vec3(1.f, 1.f, 1.f), //color
-		glm::vec2(0.f, 0.f)); //texcoord
+		glm::vec3(0.f, 1.f, 0.f), //norm
+		glm::vec2(1.f, 1.f)); //texcoord
 
 	verts.emplace_back(
 		glm::vec3(-1.f, 0, -1.f), //pos
-		glm::vec3(0.f, 1.f, 0.f), //norm
 		glm::vec3(1.f, 1.f, 1.f), //color
+		glm::vec3(0.f, 1.f, 0.f), //norm
 		glm::vec2(0.f, 0.f)); //texcoord
 
 	verts.emplace_back(
 		glm::vec3(-1.f, 0, 1.f), //pos
-		glm::vec3(0.f, 1.f, 0.f), //norm
 		glm::vec3(1.f, 1.f, 1.f), //color
-		glm::vec2(0.f, 0.f)); //texcoord
+		glm::vec3(0.f, 1.f, 0.f), //norm
+		glm::vec2(0.f, 1.f)); //texcoord
 
 	elements = std::vector<unsigned int>{ 0, 1, 2, 2, 1, 3 };
 
 	Model m(std::move(verts), std::move(elements));
 
 	GLModel glModel(std::move(m));
+
+	glModel.SetUpMesh();
+
+	Models.emplace(0, std::move(glModel));
 
 	//Models[0] = std::move(glModel);
 
