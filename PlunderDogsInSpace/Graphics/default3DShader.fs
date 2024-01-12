@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 struct pointLight
 {
@@ -22,10 +22,10 @@ in vec3 Normal;
 in vec3 Color;
 
 uniform sampler2D Texture;
-uniform pointLight pointLights[100];
-uniform int numPointLights;
-uniform spotLight spotLights[100];
-uniform int numSpotLights;
+//uniform pointLight pointLights[100];
+//uniform int numPointLights;
+//uniform spotLight spotLights[100];
+//uniform int numSpotLights;
 uniform vec3 cameraPosition;
 uniform vec3 ambientLighting;
 
@@ -33,6 +33,8 @@ vec3 surfaceDiffuse;
 vec3 surfaceSpecular;
 vec3 finalColour = vec3(0, 0, 0);
 vec3 normal;
+
+out vec4 out_color;
 
 vec3 getPointLightDiffuse(pointLight light)
 {
@@ -80,7 +82,7 @@ void main()
 {
 	normal = normalize(Normal);
 
-	surfaceDiffuse = texture(Texture, TexCoord).xyz;
+	//surfaceDiffuse = texture(Texture, TexCoord).xyz;
 
 	//without specular
 	//for (int i = 0; i < numPointLights; i++)
@@ -89,12 +91,12 @@ void main()
 	//}
 
 	//with specular
-	for(int i = 0; i < numPointLights; i++)
-	{
-		vec3 diffuse = getPointLightDiffuse(pointLights[i]);
-		vec3 specular = getPointLightSpecular(pointLights[i]);
-		finalColour += pointLights[i].m_intensity * (diffuse + specular);
-	}
+	//for(int i = 0; i < numPointLights; i++)
+	//{
+	//	vec3 diffuse = getPointLightDiffuse(pointLights[i]);
+	//	vec3 specular = getPointLightSpecular(pointLights[i]);
+	//	finalColour += pointLights[i].m_intensity * (diffuse + specular);
+	//}
 
 	//without specular
 	//for (int i = 0; i < numSpotLights; i++)
@@ -103,18 +105,19 @@ void main()
 	//}
 
 	//with specular
-	for(int i = 0; i < numSpotLights; i++)
-	{
-		vec3 diffuse = getSpotLightDiffuse(spotLights[i]);
-		vec3 specular = getSpotLightSpecular(spotLights[i]);
-		finalColour += spotLights[i].m_intensity * (diffuse + specular);
-	}
+	//for(int i = 0; i < numSpotLights; i++)
+	//{
+	//	vec3 diffuse = getSpotLightDiffuse(spotLights[i]);
+	//	vec3 specular = getSpotLightSpecular(spotLights[i]);
+	//	finalColour += spotLights[i].m_intensity * (diffuse + specular);
+	//}
 
-	vec3 reflectedLight = (ambientLighting * surfaceDiffuse) + finalColour;
+	//vec3 reflectedLight = (ambientLighting * surfaceDiffuse) + finalColour;
 
 	//gl_FragColor = vec4(1, 0, 0, 1);
-	gl_FragColor = vec4(reflectedLight, 1.0);
+	//gl_FragColor = vec4(reflectedLight, 1.0);
 	//gl_FragColor = vec4(vec3(1, 1, 1) * normal, 1.0);
 	//gl_FragColor = texture(Texture, TexCoord).xyz;
-	gl_FragColor = vec4(Color, 1.0);
+	//gl_FragColor = vec4(Color, 1.0);
+	out_color = vec4(Color, 1.0);
 }

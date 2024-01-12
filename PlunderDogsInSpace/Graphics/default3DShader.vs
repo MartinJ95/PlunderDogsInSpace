@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexColor;
@@ -14,6 +14,9 @@ out vec4 gl_Position;
 uniform mat4 model_xform;
 uniform mat4 view;
 uniform mat4 projection;
+uniform sampler2D Texture;
+uniform vec3 cameraPosition;
+uniform vec3 ambientLighting;
 
 void main()
 {
