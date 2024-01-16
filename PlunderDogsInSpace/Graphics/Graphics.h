@@ -167,7 +167,9 @@ struct GLModelLoading
 public:
 	void LoadBaseModels(std::unordered_map<unsigned int, GLModel>& Models);
 private:
+	void GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& min, const glm::vec3& max, const glm::vec3& color, const glm::vec3& normal, unsigned int offset) const;
 	void LoadPlane(std::unordered_map<unsigned int, GLModel>& Models);
+	void LoadBox(std::unordered_map<unsigned int, GLModel>& Models);
 };
 
 class GLGraphics : public Graphics

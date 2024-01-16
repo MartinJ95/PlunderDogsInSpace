@@ -363,6 +363,44 @@ void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& M
 	LoadPlane(Models);
 }
 
+void GLModelLoading::GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& min, const glm::vec3& max, const glm::vec3& color, const glm::vec3& normal, unsigned int offset) const
+{
+	verts.emplace_back(
+		glm::vec3(min.x, min.y, max.z),
+		color,
+		normal,
+		glm::vec2(0.f, 1.f)
+	);
+
+	verts.emplace_back(
+		glm::vec3(max.x, min.y, max.z),
+		color,
+		normal,
+		glm::vec2(1.f, 1.f)
+	);
+
+	verts.emplace_back(
+		glm::vec3(min.x, min.y, min.z),
+		color,
+		normal,
+		glm::vec2(0.f, 0.f)
+	);
+
+	verts.emplace_back(
+		glm::vec3(max.x, min.y, min.z),
+		color,
+		normal,
+		glm::vec2(1.f, 0.f)
+	);
+	0 1 2 2 1 3
+	elements.emplace_back(0);
+	elements.emplace_back(1);
+	elements.emplace_back(2);
+	elements.emplace_back(2);
+	elements.emplace_back(1);
+	elements.emplace_back(3);
+}
+
 void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models)
 {
 	std::vector<Vertex> verts;
@@ -408,4 +446,12 @@ void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models
 	//Models.insert(0, GLModel(std::move(m)));
 	//Models.insert(std::pair<unsigned int, GLModel>(0, std::move(GLModel(std::move(m)))));
 	//m_models.emplace(std::pair<unsigned int, GLModel>(0, std::move(m)));
+}
+
+void GLModelLoading::LoadBox(std::unordered_map<unsigned int, GLModel>& Models)
+{
+	std::vector<Vertex> verts;
+	std::vector<unsigned int> elements;
+
+
 }
