@@ -127,6 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Collisions.h" />
+    <ClInclude Include="RigidBody.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Collisions.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
