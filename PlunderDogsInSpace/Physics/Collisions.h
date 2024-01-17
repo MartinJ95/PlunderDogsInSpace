@@ -9,6 +9,7 @@ struct CollisionData
 	RigidBody* other;
 	float penetrationDepth;
 	glm::vec3 collisionNormal;
+	bool hasHit;
 };
 
 struct Ray
@@ -27,3 +28,13 @@ struct SphereCollider
 {
 	float radius;
 };
+
+struct PlaneCollider
+{
+	glm::vec3 planeNormal;
+};
+
+
+//raycast functions
+static void RayToPlane(const Ray& Raycast, const PlaneCollider& Plane, CollisionData& Data);
+static void RayToSphere(const Ray& Raycast, const SphereCollider& Sphere, CollisionData& Data);
