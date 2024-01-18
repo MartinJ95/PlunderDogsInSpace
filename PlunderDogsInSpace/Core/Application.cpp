@@ -32,6 +32,14 @@ void Application::PhysicsStep()
 
 void Application::Update()
 {
+    glm::vec3 mouseMovement = glm::vec3(0.f);
+    
+    mouseMovement.x -= glfwGetKey(m_graphics.GetWindow(), GLFW_KEY_A);
+    mouseMovement.x += glfwGetKey(m_graphics.GetWindow(), GLFW_KEY_D);
+    mouseMovement.z += glfwGetKey(m_graphics.GetWindow(), GLFW_KEY_S);
+    mouseMovement.z -= glfwGetKey(m_graphics.GetWindow(), GLFW_KEY_W);
+    
+    m_graphics.GetCamera().SetPos(m_graphics.GetCamera().GetPos() + (mouseMovement * m_timeManager.deltaTime));
 }
 
 void Application::EndOfFrame()
@@ -42,6 +50,7 @@ void Application::Run()
 {
     while (!m_graphics.ShouldWindowClose())
     {
+        m_timeManager.TimeStep();
         m_graphics.Clear();
         Update();
         Render();
