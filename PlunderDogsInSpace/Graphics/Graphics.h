@@ -188,6 +188,7 @@ public:
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
 	GLShader& GetShader(const int ID) { return m_shaders.at(ID); }
+	GLFWwindow* GetWindow() const { return m_window; }
 protected:
 	GLFWwindow* m_window;
 	GLShader m_shader;
