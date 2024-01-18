@@ -23,7 +23,7 @@ void RayToPlane(const Ray& Raycast, const PlaneCollider& Plane, CollisionData& D
 		float percentage = glm::dot(DestToPlaneOrigin, DestToOrigin);
 
 		Data.penetrationDepth =  glm::length(PlanePos - (Raycast.origin + Raycast.line)) * percentage;
-	}
 
-	return Data;
+		Data.pointOfCollision = (Raycast.origin + (Raycast.line * (glm::length(Raycast.line) - Data.penetrationDepth)))
+	}
 }

@@ -9,6 +9,7 @@ struct CollisionData
 	RigidBody* other;
 	float penetrationDepth;
 	glm::vec3 collisionNormal;
+	glm::vec3 pointOfCollision;
 	bool hasHit;
 };
 
