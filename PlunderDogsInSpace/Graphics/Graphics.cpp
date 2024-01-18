@@ -392,7 +392,7 @@ void GLModelLoading::GenFace(std::vector<Vertex>& verts, std::vector<unsigned in
 		normal,
 		glm::vec2(1.f, 0.f)
 	);
-	0 1 2 2 1 3
+
 	elements.emplace_back(0);
 	elements.emplace_back(1);
 	elements.emplace_back(2);
