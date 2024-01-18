@@ -6,7 +6,7 @@ void RayToPlane(const Ray& Raycast, const PlaneCollider& Plane, CollisionData& D
 	glm::vec3 PlanePos = glm::vec3(0.f);
 	if (Data.other != nullptr)
 	{
-		PlanePos = Data.other->GetPosition();
+		PlanePos = Data.other->GetTransform().position;
 	}
 
 	float originDot = glm::dot(Plane.planeNormal, Raycast.origin - PlanePos);
@@ -24,6 +24,6 @@ void RayToPlane(const Ray& Raycast, const PlaneCollider& Plane, CollisionData& D
 
 		Data.penetrationDepth =  glm::length(PlanePos - (Raycast.origin + Raycast.line)) * percentage;
 
-		Data.pointOfCollision = (Raycast.origin + (Raycast.line * (glm::length(Raycast.line) - Data.penetrationDepth)))
+		Data.pointOfCollision = (Raycast.origin + (Raycast.line * (glm::length(Raycast.line) - Data.penetrationDepth)));
 	}
 }

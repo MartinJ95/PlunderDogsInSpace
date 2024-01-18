@@ -1,6 +1,6 @@
 #include "RigidBody.h"
 
-RigidBody::RigidBody() : m_position(glm::vec3(0.f)), m_velocity(glm::vec3(0.f)), m_force(glm::vec3(0.f)), m_constantForce(glm::vec3(0.f, 0.f, 0.f)), m_mass(10.f)
+RigidBody::RigidBody() : m_transform(), m_velocity(glm::vec3(0.f)), m_force(glm::vec3(0.f)), m_constantForce(glm::vec3(0.f, 0.f, 0.f)), m_mass(10.f)
 {
 }
 
@@ -13,12 +13,12 @@ void RigidBody::ApplyPhysics(const float DeltaTime, const glm::quat& Rotation)
 
 	m_velocity *= 0.9f;
 
-	m_position += m_velocity;
+	m_transform.position += m_velocity;
 }
 
-const glm::vec3& RigidBody::GetPosition() const
+const Transform& RigidBody::GetTransform() const
 {
-	return m_position;
+	return m_transform;
 }
 
 void RigidBody::SetForce(const glm::vec3& NewForce)
@@ -45,4 +45,9 @@ inline glm::vec3 RigidBody::GetVelocityChange(const float DeltaTime) const
 inline glm::vec3 RigidBody::ApplyRotation(const glm::vec3& VelocityChange, const glm::quat& Rotation)
 {
 	return Rotation * VelocityChange * glm::conjugate(Rotation);
+}
+
+void Transform::EndFrame()
+{
+	position = newPosition;
 }
