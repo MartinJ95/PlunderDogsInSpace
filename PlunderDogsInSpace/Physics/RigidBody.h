@@ -14,14 +14,14 @@ class RigidBody
 {
 public:
 	RigidBody();
-	void ApplyPhysics(const float DeltaTime, const glm::quat& Rotation);
+	void ApplyPhysics(const float DeltaTime);
 	const Transform& GetTransform() const;
 	void SetForce(const glm::vec3& NewForce);
 	void AddForce(const glm::vec3& AddedForce);
 	void SubtractForce(const glm::vec3& SubtractedForce);
 private:
 	inline glm::vec3 GetVelocityChange(const float DeltaTime) const;
-	inline glm::vec3 ApplyRotation(const glm::vec3& VelocityChange, const glm::quat& Rotation);
+	inline glm::vec3 ApplyRotation(const glm::vec3& VelocityChange);
 private:
 	Transform m_transform;
 	glm::vec3 m_velocity;

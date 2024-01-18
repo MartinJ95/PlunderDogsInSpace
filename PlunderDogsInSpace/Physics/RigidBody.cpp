@@ -4,7 +4,7 @@ RigidBody::RigidBody() : m_transform(), m_velocity(glm::vec3(0.f)), m_force(glm:
 {
 }
 
-void RigidBody::ApplyPhysics(const float DeltaTime, const glm::quat& Rotation)
+void RigidBody::ApplyPhysics(const float DeltaTime)
 {
 	glm::vec3 VelocityChange = GetVelocityChange(DeltaTime);
 	ApplyRotation(VelocityChange, Rotation);
@@ -42,9 +42,9 @@ inline glm::vec3 RigidBody::GetVelocityChange(const float DeltaTime) const
 	return acceleration * DeltaTime;
 }
 
-inline glm::vec3 RigidBody::ApplyRotation(const glm::vec3& VelocityChange, const glm::quat& Rotation)
+inline glm::vec3 RigidBody::ApplyRotation(const glm::vec3& VelocityChange)
 {
-	return Rotation * VelocityChange * glm::conjugate(Rotation);
+	return m_transform.rotation * VelocityChange * glm::conjugate(m_transform.rotation);
 }
 
 void Transform::EndFrame()
