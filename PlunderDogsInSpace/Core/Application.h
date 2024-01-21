@@ -1,5 +1,6 @@
 #pragma once
 #include "../Graphics/Graphics.h"
+#include "../Physics/RigidBody.h"
 #include <chrono>
 #ifdef OpenGL
 typedef GLGraphics DefaultGraphics;
@@ -21,6 +22,14 @@ struct TimeManager
 	float deltaTime;
 };
 
+struct Entity
+{
+	Entity() : m_body(), m_meshID(0)
+	{}
+	RigidBody m_body;
+	unsigned int m_meshID;
+};
+
 class Application
 {
 public:
@@ -34,5 +43,6 @@ public:
 protected:
 	DefaultGraphics m_graphics;
 	TimeManager m_timeManager;
+	std::vector<Entity> m_entities;
 };
 
