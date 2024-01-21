@@ -113,7 +113,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Graphics.lib</AdditionalDependencies>
+      <AdditionalDependencies>Graphics.lib;Physics.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)x64/Debug</AdditionalLibraryDirectories>
