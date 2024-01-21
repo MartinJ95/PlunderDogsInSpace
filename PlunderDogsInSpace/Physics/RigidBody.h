@@ -4,10 +4,24 @@
 
 struct Transform
 {
+public:
+	Transform();
 	void EndFrame();
+	const glm::mat4& GetModelXform();
+	void SetPosition(const glm::vec3& NewPosition);
+	void Move(const glm::vec3& MovementVector);
+	const glm::vec3& GetPosition() const;
+	void SetRotation(const glm::quat& NewRotation);
+	const glm::quat& GetRotation() const;
+private:
+	void CalculateXForm();
+private:
 	glm::vec3 position;
 	glm::vec3 newPosition;
+	glm::vec3 scale;
 	glm::quat rotation;
+	glm::mat4 modelXForm;
+	bool dirtyXForm;
 };
 
 class RigidBody
@@ -15,7 +29,7 @@ class RigidBody
 public:
 	RigidBody();
 	void ApplyPhysics(const float DeltaTime);
-	const Transform& GetTransform() const;
+	Transform& GetTransform();
 	void SetForce(const glm::vec3& NewForce);
 	void AddForce(const glm::vec3& AddedForce);
 	void SubtractForce(const glm::vec3& SubtractedForce);
