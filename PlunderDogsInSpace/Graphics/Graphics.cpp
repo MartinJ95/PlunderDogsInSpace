@@ -63,6 +63,7 @@ bool GLGraphics::Init()
 	}
 
 	m_shaders.emplace(0, GLShader("default3DShader.vs", "default3DShader.fs"));
+	m_shaders.emplace(1, GLShader("clickIndicator.vs", "clickIndicator.fs"));
 
 	GLModelLoading modelLoader;
 
@@ -70,6 +71,8 @@ bool GLGraphics::Init()
 
 	glEnable(GL_DEPTH_TEST);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	return true;
 }
@@ -80,6 +83,13 @@ void GLGraphics::SetCallbacks()
 
 void GLGraphics::ResizeScreen()
 {
+}
+
+glm::vec2 GLGraphics::GetMouseLocation() const
+{
+	double xPos, yPos;
+	glfwGetCursorPos(m_window, &xPos, &yPos);
+	return glm::vec2(xPos, yPos);
 }
 
 bool GLGraphics::ShouldWindowClose()
@@ -93,15 +103,15 @@ void GLGraphics::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GLGraphics::Render(const unsigned int ID, const bool Is3D, const glm::mat4& ModelXForm)
+void GLGraphics::Render(const unsigned int ModelID, const unsigned int ShaderID, const bool Is3D, const glm::mat4& ModelXForm)
 {
-	if (m_models.find(ID) == m_models.end())
+	if (m_models.find(ModelID) == m_models.end())
 		return;
 
 	if (Is3D)
-		m_shaders.find(ID)->second.m_uniforms.SetMat4(m_shaders.find(ID)->second.GetID(), "model_xform", ModelXForm);
+		m_shaders.find(ShaderID)->second.m_uniforms.SetMat4(m_shaders.find(ShaderID)->second.GetID(), "model_xform", ModelXForm);
 
-	m_models.find(ID)->second.Render(m_shader);
+	m_models.find(ModelID)->second.Render(m_shader);
 }
 
 void GLGraphics::Display()
@@ -333,7 +343,7 @@ Model::Model(Model&& other) :
 {
 }
 
-Camera::Camera() : m_position(glm::vec3(0.f, 0.f, 0.f)), m_rotation()
+Camera::Camera() : m_position(glm::vec3(0.f, 0.f, 0.f)), m_rotation(), m_fov(45.f)
 {
 }
 
@@ -348,7 +358,7 @@ void GLShader::SetRender3D(const Camera& Cam) const
 	m_uniforms.SetVec3(ID, "cameraPosition", Cam.GetPos());
 	m_uniforms.SetVec3(ID, "ambientLighting", glm::vec3(1.f, 1.f, 1.f));
 	//width = 1280, height = 720, fov = 90
-	glm::mat4 projection = glm::perspective(glm::radians(90.f), 1280.f / 720.f, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(Cam.GetFOV()), 1280.f / 720.f, 0.1f, 100.0f);
 	m_uniforms.SetMat4(ID, "projection", projection);
 	glm::vec3 camPos = Cam.GetPos();
 	glm::vec3 up(0.f, 1.f, 0.f);

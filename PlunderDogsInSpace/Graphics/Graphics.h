@@ -28,9 +28,34 @@ public:
 		q = q * glm::conjugate(m_rotation);
 		return glm::vec3(q.x, q.y, q.z);
 	}
+	glm::vec3 GetViewDirOnScreen(const glm::vec2& ScreenSize, const glm::vec2& MousePosition) const
+	{
+		glm::quat q(0.f, 0.f, 0.f, -1.f);
+		glm::quat rotator = m_rotation;
+
+		float xRotation = m_fov * (MousePosition.y / ScreenSize.y);
+		xRotation -= m_fov * 0.5;
+		xRotation *= -1;
+
+		float yRotation = m_fov * (MousePosition.x / ScreenSize.x);
+		yRotation -= m_fov * 0.5;
+		yRotation *= -1;
+
+		rotator *= glm::quat(glm::vec3(glm::radians(xRotation), 0.f, 0.f));
+		rotator *= glm::quat(glm::vec3(0.f, glm::radians(yRotation), 0.f));
+
+		q = rotator * q;
+		q = q * glm::conjugate(rotator);
+		return glm::vec3(q.x, q.y, q.z);
+	}
+	float GetFOV() const
+	{
+		return m_fov;
+	}
 protected:
 	glm::vec3 m_position;
 	glm::quat m_rotation;
+	float m_fov;
 };
 
 struct Vertex
@@ -96,7 +121,7 @@ protected:
 
 struct GLUniformSetter
 {
-	inline void SetFloat(const int ID, const std::string& name, float value) const;
+	void SetFloat(const int ID, const std::string& name, float value) const;
 	inline void SetBool(const int ID, const std::string& name, bool value) const;
 	inline void SetInt(const int ID, const std::string& name, int value) const;
 	inline void SetVec3(const int ID, const std::string& name, const glm::vec3& value) const;
@@ -136,9 +161,14 @@ public:
 	virtual bool Init() = 0;
 	virtual void SetCallbacks() = 0;
 	virtual void ResizeScreen() = 0;
+	glm::vec2 GetScreenDimensions() const
+	{
+		return glm::vec2(m_screenWidth, m_screenHeight);
+	}
+	virtual glm::vec2 GetMouseLocation() const = 0;
 	virtual bool ShouldWindowClose() = 0;
 	virtual void Clear() = 0;
-	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) = 0;
+	virtual void Render(const unsigned int ModelID, const unsigned int ShaderID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) = 0;
 	virtual void Display() = 0;
 	virtual void PollEvents() = 0;
 	Camera& GetCamera() { return m_cam; }
@@ -155,9 +185,10 @@ public:
 	virtual bool Init() override final { return false; }
 	virtual void SetCallbacks() override final {}
 	virtual void ResizeScreen() override final {}
+	virtual glm::vec2 GetMouseLocation() const override final { return glm::vec2(0.f); }
 	virtual bool ShouldWindowClose() override final { return true; }
 	virtual void Clear() override final {}
-	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final {}
+	virtual void Render(const unsigned int ModelID, const unsigned int ShaderID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final {}
 	virtual void Display() override final {}
 	virtual void PollEvents() override final {}
 };
@@ -182,9 +213,10 @@ public:
 	virtual bool Init() override final;
 	virtual void SetCallbacks() override final;
 	virtual void ResizeScreen() override final;
+	virtual glm::vec2 GetMouseLocation() const override final;
 	virtual bool ShouldWindowClose() override final;
 	virtual void Clear() override final;
-	virtual void Render(const unsigned int ID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final;
+	virtual void Render(const unsigned int ModelID, const unsigned int ShaderID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final;
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
 	GLShader& GetShader(const int ID) { return m_shaders.at(ID); }
