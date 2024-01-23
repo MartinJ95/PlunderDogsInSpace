@@ -32,5 +32,7 @@
     <None Include="default2DShader.vs" />
     <None Include="default3DShader.fs" />
     <None Include="default3DShader.vs" />
+    <None Include="clickIndicator.fs" />
+    <None Include="clickIndicator.vs" />
   </ItemGroup>
 </Project>

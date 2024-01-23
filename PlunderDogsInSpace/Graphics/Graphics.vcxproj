@@ -143,6 +143,8 @@
     <ClCompile Include="Graphics.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="clickIndicator.fs" />
+    <None Include="clickIndicator.vs" />
     <None Include="default2DShader.fs" />
     <None Include="default2DShader.vs" />
     <None Include="default3DShader.fs" />
