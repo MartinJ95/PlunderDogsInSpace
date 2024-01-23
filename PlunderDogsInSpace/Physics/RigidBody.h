@@ -28,16 +28,14 @@ class RigidBody
 {
 public:
 	RigidBody();
-	void ApplyPhysics(const float DeltaTime);
-	Transform& GetTransform();
+	void ApplyPhysics(const float DeltaTime, Transform& T);
 	void SetForce(const glm::vec3& NewForce);
 	void AddForce(const glm::vec3& AddedForce);
 	void SubtractForce(const glm::vec3& SubtractedForce);
 private:
 	inline glm::vec3 GetVelocityChange(const float DeltaTime) const;
-	inline glm::vec3 ApplyRotation(const glm::vec3& VelocityChange);
+	inline glm::vec3 ApplyRotation(const glm::vec3& VelocityChange, Transform& T);
 private:
-	Transform m_transform;
 	glm::vec3 m_velocity;
 	glm::vec3 m_force;
 	glm::vec3 m_constantForce;

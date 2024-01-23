@@ -1,24 +1,19 @@
 #include "RigidBody.h"
 
-RigidBody::RigidBody() : m_transform(), m_velocity(glm::vec3(0.f)), m_force(glm::vec3(0.f)), m_constantForce(glm::vec3(0.f, 0.f, 0.f)), m_mass(10.f)
+RigidBody::RigidBody() : m_velocity(glm::vec3(0.f)), m_force(glm::vec3(0.f)), m_constantForce(glm::vec3(0.f, 0.f, 0.f)), m_mass(10.f)
 {
 }
 
-void RigidBody::ApplyPhysics(const float DeltaTime)
+void RigidBody::ApplyPhysics(const float DeltaTime, Transform& T)
 {
 	glm::vec3 VelocityChange = GetVelocityChange(DeltaTime);
-	ApplyRotation(VelocityChange);
+	ApplyRotation(VelocityChange, T);
 
 	m_velocity += VelocityChange;
 
 	m_velocity *= 0.9f;
 
-	m_transform.Move(m_velocity);
-}
-
-Transform& RigidBody::GetTransform()
-{
-	return m_transform;
+	T.Move(m_velocity);
 }
 
 void RigidBody::SetForce(const glm::vec3& NewForce)
@@ -42,9 +37,9 @@ inline glm::vec3 RigidBody::GetVelocityChange(const float DeltaTime) const
 	return acceleration * DeltaTime;
 }
 
-inline glm::vec3 RigidBody::ApplyRotation(const glm::vec3& VelocityChange)
+inline glm::vec3 RigidBody::ApplyRotation(const glm::vec3& VelocityChange, Transform& T)
 {
-	return m_transform.GetRotation() * VelocityChange * glm::conjugate(m_transform.GetRotation());
+	return T.GetRotation() * VelocityChange * glm::conjugate(T.GetRotation());
 }
 
 Transform::Transform() : position(glm::vec3(0.f)), newPosition(glm::vec3(0.f)), scale(glm::vec3(1.f)), rotation(glm::quat(glm::vec3(0.f, 0.f, 0.f))), modelXForm() , dirtyXForm(true)
