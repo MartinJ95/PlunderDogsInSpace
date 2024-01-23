@@ -1,9 +1,13 @@
-del ".\x64\Debug\default2DShader.vs"
-del ".\x64\Debug\default2DShader.fs"
-del ".\x64\Debug\default3DShader.vs"
-del ".\x64\Debug\default3DShader.fs"
+set list= default2DShader default3DShader clickIndicator
 
-del ".\Game\default2DShader.vs"
-del ".\Game\default2DShader.fs"
-del ".\Game\default3DShader.vs"
-del ".\Game\default3DShader.fs"
+(for %%a in (%list%) do (
+call :CleanShader %%a
+))
+
+:CleanShader
+del ".\x64\Debug\%~1.vs"
+del ".\x64\Debug\%~1.fs"
+
+del ".\Game\%~1.vs"
+del ".\Game\%~1.fs"
+EXIT /B

@@ -1,9 +1,13 @@
-robocopy ".\Graphics" ".\Game" default2DShader.vs
-robocopy ".\Graphics" ".\Game" default2DShader.fs
-robocopy ".\Graphics" ".\Game" default3DShader.vs
-robocopy ".\Graphics" ".\Game" default3DShader.fs
+set list= default2DShader default3DShader clickIndicator
 
-robocopy ".\Graphics" ".\x64\Debug" default2DShader.vs
-robocopy ".\Graphics" ".\x64\Debug" default2DShader.fs
-robocopy ".\Graphics" ".\x64\Debug" default3DShader.vs
-robocopy ".\Graphics" ".\x64\Debug" default3DShader.fs
+(for %%a in (%list%) do (
+call :DistributeShader %%a
+))
+
+:DistributeShader
+robocopy ".\Graphics" ".\Game" %~1.vs
+robocopy ".\Graphics" ".\Game" %~1.fs
+
+robocopy ".\Graphics" ".\x64\Debug" %~1.vs
+robocopy ".\Graphics" ".\x64\Debug" %~1.fs
+EXIT /B
