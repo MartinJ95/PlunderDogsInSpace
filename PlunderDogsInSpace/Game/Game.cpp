@@ -1,6 +1,6 @@
-#include "../Core/Application.h"
+#include "Sandbox.h"
 
 Application* EntryApp()
 {
-	return new Application();
+	return new Sandbox();
 }
