@@ -6,3 +6,4 @@
 @RD /S /Q "Math/x64"
 @RD /S /Q "Sound/x64"
 @RD /S /Q "Physics/x64"
+@RD /S /S "AI/x64"
