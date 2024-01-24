@@ -1,14 +1,13 @@
 #include "Application.h"
-
-//function to make a new application, marked as extern so that users can define their own derived application class
-extern Application* EntryApp();
+#include "ServiceLocator.h"
 
 int main()
 {
-	Application* app = EntryApp();
-	if (app->Init())
+	//Application* app = EntryApp();
+	ServiceLocator::Init();
+	if (ServiceLocator::GetMainService()->Init())
 	{
-		app->Run();
+		ServiceLocator::GetMainService()->Run();
 	}
-	delete app;
+	ServiceLocator::CleanUp();
 }
