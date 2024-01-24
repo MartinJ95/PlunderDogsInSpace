@@ -27,11 +27,18 @@ class Application
 public:
 	Application();
 	virtual bool Init();
-	virtual void Render();
-	virtual void PhysicsStep();
 	virtual void Update();
+	virtual void PhysicsStep();
+	virtual void Render();
 	virtual void EndOfFrame();
 	void Run();
+public:
+	friend class ServiceLocator;
+protected:
+	DefaultGraphics& GetGraphics()
+	{
+		return m_graphics;
+	}
 protected:
 	DefaultGraphics m_graphics;
 	TimeManager m_timeManager;
