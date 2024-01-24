@@ -7,7 +7,8 @@ struct Transform
 public:
 	Transform();
 	void EndFrame();
-	const glm::mat4& GetModelXform();
+	const glm::mat4& GetModelXform() const;
+	void CheckModelXForm();
 	void SetPosition(const glm::vec3& NewPosition);
 	void Move(const glm::vec3& MovementVector);
 	const glm::vec3& GetPosition() const;

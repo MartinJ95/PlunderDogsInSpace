@@ -21,7 +21,7 @@ struct CollisionData
 	friend std::ostream& operator<<(std::ostream& os, const CollisionData& data);
 };
 
-std::ostream& operator<<(std::ostream& os, const CollisionData& data)
+inline std::ostream& operator<<(std::ostream& os, const CollisionData& data)
 {
 	system("CLS");
 	os << "Penetration Depth: " << data.penetrationDepth << "\n"

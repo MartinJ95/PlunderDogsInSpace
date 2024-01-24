@@ -55,13 +55,23 @@ void Transform::EndFrame()
 	position = newPosition;
 }
 
-const glm::mat4& Transform::GetModelXform()
+const glm::mat4& Transform::GetModelXform() const
+{
+	/*
+	if (dirtyXForm)
+	{
+		CalculateXForm();
+	}
+	*/
+	return modelXForm;
+}
+
+void Transform::CheckModelXForm()
 {
 	if (dirtyXForm)
 	{
 		CalculateXForm();
 	}
-	return modelXForm;
 }
 
 void Transform::SetPosition(const glm::vec3& NewPosition)
