@@ -373,42 +373,48 @@ void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& M
 	LoadPlane(Models);
 }
 
-void GLModelLoading::GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& min, const glm::vec3& max, const glm::vec3& color, const glm::vec3& normal, unsigned int offset) const
+void GLModelLoading::GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& forward, const float forwardAmount, const glm::vec3& up, const float size, const int elementOffset, const glm::vec3& positionOffset, const glm::vec3& color)
 {
+	glm::vec3 side = glm::normalize(glm::cross(forward, up));
+
+	glm::vec3 appliedForward = forward * forwardAmount;
+	glm::vec3 appliedSide = side * size;
+	glm::vec3 appliedUp = up * size;
+
 	verts.emplace_back(
-		glm::vec3(min.x, min.y, max.z),
+		appliedForward + -appliedSide + appliedUp + positionOffset,
 		color,
-		normal,
+		forward,
 		glm::vec2(0.f, 1.f)
 	);
 
 	verts.emplace_back(
-		glm::vec3(max.x, min.y, max.z),
+		appliedForward + appliedSide + appliedUp + positionOffset,
 		color,
-		normal,
+		forward,
 		glm::vec2(1.f, 1.f)
 	);
 
 	verts.emplace_back(
-		glm::vec3(min.x, min.y, min.z),
+		appliedForward + -appliedSide + -appliedUp + positionOffset,
 		color,
-		normal,
+		forward,
 		glm::vec2(0.f, 0.f)
 	);
 
 	verts.emplace_back(
-		glm::vec3(max.x, min.y, min.z),
+		appliedForward + appliedSide + -appliedUp + positionOffset,
 		color,
-		normal,
+		forward,
 		glm::vec2(1.f, 0.f)
 	);
 
-	elements.emplace_back(0);
-	elements.emplace_back(1);
-	elements.emplace_back(2);
-	elements.emplace_back(2);
-	elements.emplace_back(1);
-	elements.emplace_back(3);
+	elements.emplace_back(0+elementOffset);
+	elements.emplace_back(1+elementOffset);
+	elements.emplace_back(2+elementOffset);
+	elements.emplace_back(2+elementOffset);
+	elements.emplace_back(1+elementOffset);
+	elements.emplace_back(3+elementOffset);
 }
 
 void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models)
@@ -416,31 +422,7 @@ void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models
 	std::vector<Vertex> verts;
 	std::vector<unsigned int> elements;
 
-	verts.emplace_back(
-		glm::vec3(1.f, 0, -1.f), //pos
-		glm::vec3(1.f, 1.f, 1.f), //color
-		glm::vec3(0.f, 1.f, 0.f), //norm
-		glm::vec2(1.f, 0.f)); //texcoord
-
-	verts.emplace_back(
-		glm::vec3(1.f, 0, 1.f), //pos
-		glm::vec3(1.f, 1.f, 1.f), //color
-		glm::vec3(0.f, 1.f, 0.f), //norm
-		glm::vec2(1.f, 1.f)); //texcoord
-
-	verts.emplace_back(
-		glm::vec3(-1.f, 0, -1.f), //pos
-		glm::vec3(1.f, 1.f, 1.f), //color
-		glm::vec3(0.f, 1.f, 0.f), //norm
-		glm::vec2(0.f, 0.f)); //texcoord
-
-	verts.emplace_back(
-		glm::vec3(-1.f, 0, 1.f), //pos
-		glm::vec3(1.f, 1.f, 1.f), //color
-		glm::vec3(0.f, 1.f, 0.f), //norm
-		glm::vec2(0.f, 1.f)); //texcoord
-
-	elements = std::vector<unsigned int>{ 0, 1, 2, 2, 1, 3 };
+	GenFace(verts, elements, glm::vec3(0.f, 1.f, 0.f), 0.f, glm::vec3(0.f, 0.f, 1.f), 1.f);
 
 	Model m(std::move(verts), std::move(elements));
 
@@ -449,13 +431,6 @@ void GLModelLoading::LoadPlane(std::unordered_map<unsigned int, GLModel>& Models
 	glModel.SetUpMesh();
 
 	Models.emplace(0, std::move(glModel));
-
-	//Models[0] = std::move(glModel);
-
-	//Models.emplace(0, GLModel(std::move(m)));
-	//Models.insert(0, GLModel(std::move(m)));
-	//Models.insert(std::pair<unsigned int, GLModel>(0, std::move(GLModel(std::move(m)))));
-	//m_models.emplace(std::pair<unsigned int, GLModel>(0, std::move(m)));
 }
 
 void GLModelLoading::LoadBox(std::unordered_map<unsigned int, GLModel>& Models)
@@ -463,5 +438,22 @@ void GLModelLoading::LoadBox(std::unordered_map<unsigned int, GLModel>& Models)
 	std::vector<Vertex> verts;
 	std::vector<unsigned int> elements;
 
+	//top and bottom
+	GenFace(verts, elements, glm::vec3(0.f, 1.f, 0.f), 1.f, glm::vec3(0.f, 0.f, 1.f), 1.f);
+	GenFace(verts, elements, glm::vec3(0.f, -1.f, 0.f), 1.f, glm::vec3(0.f, 0.f, -1.f), 1.f, 4);
 
+	//sides
+	GenFace(verts, elements, glm::vec3(1.f, 0.f, 0.f), 1.f, glm::vec3(0.f, 1.f, 0.f), 1.f, 8);
+	GenFace(verts, elements, glm::vec3(-1.f, 0.f, 0.f), 1.f, glm::vec3(0.f, 1.f, 0.f), 1.f, 12);
+
+	GenFace(verts, elements, glm::vec3(0.f, 0.f, 1.f), 1.f, glm::vec3(0.f, 1.f, 0.f), 1.f, 16);
+	GenFace(verts, elements, glm::vec3(0.f, 0.f, -1.f), 1.f, glm::vec3(0.f, 1.f, 0.f), 1.f, 20);
+
+	Model m(std::move(verts), std::move(elements));
+
+	GLModel glModel(std::move(m));
+
+	glModel.SetUpMesh();
+
+	Models.emplace(1, std::move(glModel));
 }
