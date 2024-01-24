@@ -12,6 +12,16 @@ BTNodeResult BTSelectorNode::Evaluate()
     return BTNodeResult::eBTFail;
 }
 
+std::vector<BTNode*>& BTSelectorNode::GetChildren()
+{
+    return m_children;
+}
+
+void BTSelectorNode::AddChild(BTNode*&& NewNode)
+{
+    m_children.emplace_back(std::move(NewNode));
+}
+
 BTNodeResult BTSequenceNode::Evaluate()
 {
     for (BTNode*& n : m_children)
@@ -22,4 +32,23 @@ BTNodeResult BTSequenceNode::Evaluate()
         }
     }
     return BTNodeResult::eBTSuccess;
+}
+
+BehaviourTree::BehaviourTree(BTSelectorNode*&& node) : m_root(std::move(node))
+{
+}
+
+BehaviourTree::~BehaviourTree()
+{
+    delete m_root;
+}
+
+BTNodeResult BehaviourTree::Evaluate()
+{
+    return m_root->Evaluate();
+}
+
+BTSelectorNode* BehaviourTree::GetRoot()
+{
+    return m_root;
 }

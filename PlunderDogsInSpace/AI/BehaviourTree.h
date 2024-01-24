@@ -18,6 +18,8 @@ class BTSelectorNode : public BTNode
 {
 public:
 	virtual BTNodeResult Evaluate() override;
+	std::vector<BTNode*>& GetChildren();
+	void AddChild(BTNode*&& NewNode);
 protected:
 	std::vector<BTNode*> m_children;
 };
@@ -37,5 +39,13 @@ public:
 
 class BehaviourTree
 {
+public:
+	BehaviourTree(BTSelectorNode*&& node);
+	~BehaviourTree();
+public:
+	BTNodeResult Evaluate();
+	BTSelectorNode* GetRoot();
+protected:
+	BTSelectorNode* m_root;
 };
 
