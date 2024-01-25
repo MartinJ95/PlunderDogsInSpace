@@ -24,10 +24,14 @@ void BTSelectorNode::AddChild(BTNode*&& NewNode)
 
 BTSelectorNode::~BTSelectorNode()
 {
+    if (m_children.size() == 0)
+        return;
+
     for (BTNode* s : m_children)
     {
         delete s;
     }
+    m_children.clear();
 }
 
 BTNodeResult BTSequenceNode::Evaluate()
