@@ -371,6 +371,7 @@ void GLShader::SetRender3D(const Camera& Cam) const
 void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& Models)
 {
 	LoadPlane(Models);
+	LoadBox(Models);
 }
 
 void GLModelLoading::GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& forward, const float forwardAmount, const glm::vec3& up, const float size, const int elementOffset, const glm::vec3& positionOffset, const glm::vec3& color)
