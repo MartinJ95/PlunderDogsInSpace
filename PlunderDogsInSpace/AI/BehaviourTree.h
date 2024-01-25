@@ -20,6 +20,7 @@ public:
 	virtual BTNodeResult Evaluate() override;
 	std::vector<BTNode*>& GetChildren();
 	void AddChild(BTNode*&& NewNode);
+	~BTSelectorNode();
 protected:
 	std::vector<BTNode*> m_children;
 };

@@ -22,6 +22,14 @@ void BTSelectorNode::AddChild(BTNode*&& NewNode)
     m_children.emplace_back(std::move(NewNode));
 }
 
+BTSelectorNode::~BTSelectorNode()
+{
+    for (BTNode* s : m_children)
+    {
+        delete s;
+    }
+}
+
 BTNodeResult BTSequenceNode::Evaluate()
 {
     for (BTNode*& n : m_children)
