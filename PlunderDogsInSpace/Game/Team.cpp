@@ -55,7 +55,7 @@ void Ship::EndOfFrame()
 	m_transform.EndFrame();
 }
 
-Team::Team(glm::vec3 StartPos) : m_startPosition(StartPos), m_otherTeamRef(nullptr), m_ships()
+Team::Team(glm::vec3 StartPos, bool IsAI) : m_startPosition(StartPos), m_otherTeamRef(nullptr), m_ships(), isAI(IsAI)
 {
 }
 
@@ -101,4 +101,8 @@ void Team::EndOfFrame()
 	{
 		s.EndOfFrame();
 	}
+}
+
+ShipAIData::ShipAIData(Ship* Owner) : owningTeam(nullptr), owner(Owner), targetShip(nullptr), targetLocation(glm::vec3(0.f))
+{
 }

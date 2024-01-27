@@ -4,6 +4,15 @@
 
 class Team;
 
+struct ShipAIData
+{
+	ShipAIData(Ship* Owner);
+	Team* owningTeam;
+	Ship* owner;
+	Ship* targetShip;
+	glm::vec3 targetLocation;
+};
+
 struct Ship
 {
 	Ship();
@@ -15,15 +24,18 @@ struct Ship
 	void Update();
 	void Render();
 	void EndOfFrame();
+	ShipAIData& GetShipAIData() 
+	{
+		return m_shipAIData;
+	}
 protected:
-	Team* m_team;
-	Ship* targetShip;
+	ShipAIData m_shipAIData;
 };
 
 class Team
 {
 public:
-	Team(glm::vec3 StartPos);
+	Team(glm::vec3 StartPos, bool IsAI);
 public:
 	void Init(Team* Other);
 	void Update();
@@ -34,5 +46,6 @@ protected:
 	glm::vec3 m_startPosition;
 	Team* m_otherTeamRef;
 	std::vector<Ship> m_ships;
+	bool isAI;
 };
 
