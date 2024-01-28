@@ -1,12 +1,12 @@
 #include "Team.h"
 
-Ship::Ship() : ModelID(1), m_transform(), m_body(), m_tree(std::move(new BTSelectorNode)), m_team(nullptr), targetShip(nullptr)
+Ship::Ship() : ModelID(1), m_transform(), m_body(), m_tree(std::move(new BTSelectorNode)), m_shipAIData(this)
 {
 }
 
 void Ship::Init(Team* OwningTeam)
 {
-	m_team = OwningTeam;
+	m_shipAIData.owningTeam = OwningTeam;
 }
 
 void Ship::Update()
@@ -16,15 +16,15 @@ void Ship::Update()
 	m_body.ApplyPhysics(ServiceLocator::GetTimeService().deltaTime, m_transform);
 	m_transform.CheckModelXForm();
 
-	if (targetShip == nullptr)
+	if (m_shipAIData.targetShip == nullptr)
 	{
-		if (m_team->m_otherTeamRef->m_ships.size() == 0)
+		if (m_shipAIData.owningTeam->m_otherTeamRef->m_ships.size() == 0)
 			return;
 		float closest = 999999.f;
 
 		Ship* closestShip = nullptr;
 
-		for (Ship& s : m_team->m_otherTeamRef->m_ships)
+		for (Ship& s : m_shipAIData.owningTeam->m_otherTeamRef->m_ships)
 		{
 			float distance = glm::length(s.m_transform.GetPosition() - m_transform.GetPosition());
 			if (distance < closest) 
@@ -33,11 +33,11 @@ void Ship::Update()
 				closest = distance;
 			}
 		}
-		targetShip = closestShip;
+		m_shipAIData.targetShip = closestShip;
 	}
 	else
 	{
-		m_transform.Move(glm::normalize(targetShip->m_transform.GetPosition() - m_transform.GetPosition()) * ServiceLocator::GetTimeService().deltaTime);
+		m_transform.Move(glm::normalize(m_shipAIData.targetShip->m_transform.GetPosition() - m_transform.GetPosition()) * ServiceLocator::GetTimeService().deltaTime);
 	}
 }
 

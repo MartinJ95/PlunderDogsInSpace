@@ -3,6 +3,7 @@
 #include "../AI/BehaviourTree.h"
 
 class Team;
+struct Ship;
 
 struct ShipAIData
 {
