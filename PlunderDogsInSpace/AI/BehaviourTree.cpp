@@ -1,10 +1,10 @@
 #include "BehaviourTree.h"
 
-BTNodeResult BTSelectorNode::Evaluate()
+BTNodeResult BTSelectorNode::Evaluate(void* ptr)
 {
     for (BTNode*& n : m_children)
     {
-        if (n->Evaluate() == BTNodeResult::eBTSuccess)
+        if (n->Evaluate(ptr) == BTNodeResult::eBTSuccess)
         {
             return BTNodeResult::eBTSuccess;
         }
@@ -34,11 +34,11 @@ BTSelectorNode::~BTSelectorNode()
     m_children.clear();
 }
 
-BTNodeResult BTSequenceNode::Evaluate()
+BTNodeResult BTSequenceNode::Evaluate(void* ptr)
 {
     for (BTNode*& n : m_children)
     {
-        if (n->Evaluate() == BTNodeResult::eBTFail)
+        if (n->Evaluate(ptr) == BTNodeResult::eBTFail)
         {
             return BTNodeResult::eBTFail;
         }
@@ -55,9 +55,9 @@ BehaviourTree::~BehaviourTree()
     delete m_root;
 }
 
-BTNodeResult BehaviourTree::Evaluate()
+BTNodeResult BehaviourTree::Evaluate(void* ptr)
 {
-    return m_root->Evaluate();
+    return m_root->Evaluate(ptr);
 }
 
 BTSelectorNode* BehaviourTree::GetRoot()

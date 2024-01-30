@@ -11,13 +11,13 @@ enum class BTNodeResult
 class BTNode
 {
 public:
-	virtual BTNodeResult Evaluate() = 0;
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) = 0;
 };
 
 class BTSelectorNode : public BTNode
 {
 public:
-	virtual BTNodeResult Evaluate() override;
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) override;
 	std::vector<BTNode*>& GetChildren();
 	void AddChild(BTNode*&& NewNode);
 	~BTSelectorNode();
@@ -28,13 +28,13 @@ protected:
 class BTSequenceNode : public BTSelectorNode
 {
 public:
-	virtual BTNodeResult Evaluate() override final;
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) override final;
 };
 
 class BTDecoratorNode : public BTNode
 {
 public:
-	virtual BTNodeResult Evaluate() override = 0;
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) override = 0;
 };
 
 
@@ -44,7 +44,7 @@ public:
 	BehaviourTree(BTSelectorNode*&& node);
 	~BehaviourTree();
 public:
-	BTNodeResult Evaluate();
+	BTNodeResult Evaluate(void* ptr = nullptr);
 	BTSelectorNode* GetRoot();
 protected:
 	BTSelectorNode* m_root;
