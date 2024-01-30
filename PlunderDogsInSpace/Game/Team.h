@@ -5,6 +5,26 @@
 class Team;
 struct Ship;
 
+struct Projectile
+{
+	float damage;
+	float speed;
+	int modelID;
+};
+
+constexpr Projectile DefaultGunProjectile{ 10.f, 1.f, 1 };
+constexpr Projectile DefaultCannonProjectile{ 50.f, 0.5f, 1 };
+
+struct Weapon
+{
+	const Projectile& projectile;
+	float reloadSpeed;
+	int medelID;
+};
+
+constexpr Weapon DefaultGun{ DefaultGunProjectile, 1.f, 1 };
+constexpr Weapon DefaulCannon{ DefaultCannonProjectile, 5.f, 1 };
+
 struct ShipAIData
 {
 	ShipAIData(Ship* Owner);
