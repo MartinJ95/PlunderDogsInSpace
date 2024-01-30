@@ -74,9 +74,17 @@ static void RayToPlane(const Ray& Raycast, const PlaneCollider& Plane, Collision
 		glm::vec3 DestToPlaneOrigin = PlanePos - (Raycast.origin + Raycast.line);
 		glm::vec3 DestToOrigin = Raycast.origin - (Raycast.origin + Raycast.line);
 
-		Data.penetrationDepth = glm::dot(Plane.planeNormal, DestToPlaneOrigin);
+		glm::vec3 DestToPlaneFace = Plane.planeNormal * glm::dot(Plane.planeNormal, DestToPlaneOrigin);
 
-		Data.pointOfCollision = ((Raycast.origin + (glm::normalize(Raycast.line) * (glm::length(Raycast.line) - Data.penetrationDepth))));
+		glm::vec3 DestToCollisionPoint = glm::normalize(DestToOrigin) * glm::dot(glm::normalize(DestToOrigin), DestToPlaneFace);
+
+		Data.penetrationDepth = glm::length(DestToCollisionPoint);
+
+		Data.pointOfCollision = (Raycast.origin + Raycast.line) + DestToCollisionPoint;
+
+		//Data.penetrationDepth = glm::dot(Plane.planeNormal, DestToPlaneOrigin);
+
+		//Data.pointOfCollision = ((Raycast.origin + (glm::normalize(Raycast.line) * (glm::length(Raycast.line) - Data.penetrationDepth))));
 	}
 }
 static void RayToSphere(const Ray& Raycast, const SphereCollider& Sphere, CollisionData& Data);
