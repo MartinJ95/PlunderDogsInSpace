@@ -40,6 +40,7 @@ public:
 		float yRotation = m_fov * (MousePosition.x / ScreenSize.x);
 		yRotation -= m_fov * 0.5;
 		yRotation *= -1;
+		yRotation *= 1 + (ScreenSize.y / ScreenSize.x);
 
 		rotator *= glm::quat(glm::vec3(glm::radians(xRotation), 0.f, 0.f));
 		rotator *= glm::quat(glm::vec3(0.f, glm::radians(yRotation), 0.f));
