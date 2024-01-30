@@ -25,7 +25,7 @@ void PlayerController::Update()
         Ray ray;
         ray.origin = graphics.GetCamera().GetPos();
         //ray.line = glm::normalize(m_graphics.GetCamera().GetViewDir()) * 10.f;
-        ray.line = glm::normalize(graphics.GetCamera().GetViewDirOnScreen(graphics.GetScreenDimensions(), graphics.GetMouseLocation())) * 100.f;
+        ray.line = glm::normalize(graphics.GetCamera().GetViewDirOnScreen(graphics.GetScreenDimensions(), graphics.GetMouseLocation())) * 50.f;
         //std::cout << "x: " << ray.line.x << "\n" << "y: " << ray.line.y << "\n" << "z: " << ray.line.z << "\n" << "\n";
         //std::cout << "x: " << ray.origin.x << "\n" << "y: " << ray.origin.y << "\n" << "z: " << ray.origin.z << "\n" << "\n";
 
@@ -39,8 +39,8 @@ void PlayerController::Update()
         if (data.hasHit)
         {
             m_clickIndicators.emplace_back();
-            m_clickIndicators.back().m_transform.SetPosition(data.pointOfCollision);
-            //m_entities.back().m_body.GetTransform().SetPosition(ray.origin + (ray.line * 0.1f));
+            //m_clickIndicators.back().m_transform.SetPosition(data.pointOfCollision);
+            m_clickIndicators.back().m_transform.SetPosition(ray.origin + (ray.line * 1.f));
         }
         //std::cout << data;
     }
