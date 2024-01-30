@@ -34,6 +34,19 @@ struct ShipAIData
 	glm::vec3 targetLocation;
 };
 
+class BTShipMoveToLocation : BTDecoratorNode
+{
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) override
+	{
+		if (ptr == nullptr)
+			return BTNodeResult::eBTFail;
+		
+		ShipAIData* data = static_cast<ShipAIData*>(ptr);
+		
+		data->owner->m_transform.Move((data->targetLocation - data->owner->m_transform.GetPosition()) * ServiceLocator::GetTimeService().deltaTime);
+	}
+};
+
 struct Ship
 {
 	Ship();
