@@ -1,7 +1,10 @@
 #include "Team.h"
 
-Ship::Ship() : ModelID(1), m_transform(), m_body(), m_tree(std::move(new BTSelectorNode)), m_shipAIData(this)
+Ship::Ship() : ModelID(1), m_transform(), m_body(), m_tree(std::move(new BTSequenceNode)), m_shipAIData(this), m_weapon(nullptr)
 {
+	m_tree.GetRoot()->AddChild(std::move(new BTShipFindTarget));
+	m_tree.GetRoot()->AddChild(std::move(new BTShipSetMoveToLocation));
+	m_tree.GetRoot()->AddChild(std::move(new BTShipMoveToLocation));
 }
 
 void Ship::Init(Team* OwningTeam)
@@ -16,6 +19,8 @@ void Ship::Update()
 	m_body.ApplyPhysics(ServiceLocator::GetTimeService().deltaTime, m_transform);
 	m_transform.CheckModelXForm();
 
+	m_tree.Evaluate(&m_shipAIData);
+	/*
 	if (m_shipAIData.targetShip == nullptr)
 	{
 		if (m_shipAIData.owningTeam->m_otherTeamRef->m_ships.size() == 0)
@@ -38,7 +43,7 @@ void Ship::Update()
 	else
 	{
 		m_transform.Move(glm::normalize(m_shipAIData.targetShip->m_transform.GetPosition() - m_transform.GetPosition()) * ServiceLocator::GetTimeService().deltaTime);
-	}
+	}*/
 }
 
 void Ship::Render()
@@ -76,6 +81,7 @@ void Team::Init(Team* Other)
 		m_ships.back().m_transform.SetPosition(startShipPos + sideVec * (shipSpacing * i));
 		m_ships.back().Init(this);
 		m_ships.back().EndOfFrame();
+		m_ships.back().SetWeapon((i % 2 == 0 ? DefaultGun : DefaultCannon));
 	}
 }
 
