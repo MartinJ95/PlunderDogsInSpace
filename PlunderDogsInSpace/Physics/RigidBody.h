@@ -14,6 +14,11 @@ public:
 	const glm::vec3& GetPosition() const;
 	void SetRotation(const glm::quat& NewRotation);
 	const glm::quat& GetRotation() const;
+	void SetScale(const glm::vec3& Scale)
+	{
+		scale = Scale;
+		dirtyXForm = true;
+	}
 private:
 	void CalculateXForm();
 private:
