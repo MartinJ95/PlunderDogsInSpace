@@ -372,6 +372,7 @@ void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& M
 {
 	LoadPlane(Models);
 	LoadBox(Models);
+	LoadSphere(Models);
 }
 
 void GLModelLoading::GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& forward, const float forwardAmount, const glm::vec3& up, const float size, const int elementOffset, const glm::vec3& positionOffset, const glm::vec3& color)
@@ -457,4 +458,88 @@ void GLModelLoading::LoadBox(std::unordered_map<unsigned int, GLModel>& Models)
 	glModel.SetUpMesh();
 
 	Models.emplace(1, std::move(glModel));
+}
+
+
+void GLModelLoading::LoadSphere(std::unordered_map<unsigned int, GLModel>& Models)
+{
+	constexpr int details = 50;
+
+	constexpr float thetaChange = 360.f / (float)details;
+
+	std::vector<Vertex> vertices;
+	vertices.reserve(2502);
+	vertices.assign(2502, Vertex());
+	
+	std::vector<unsigned int> elements;
+
+	vertices[0] = Vertex(glm::vec3(0.f, 1.f, 0.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 1.f));
+
+	vertices[1] = Vertex(glm::vec3(0.f, -1.f, 0.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, -1.f, 0.f), glm::vec2(0.f, 0.f));
+
+	for (int i = 0; i < details; i++)
+	{
+		glm::vec3 initial = glm::vec3(0.f, 1.f, 0.f);
+		
+		float thetaChange1 = thetaChange * (i + 1);
+
+		for (int j = 0; j < details; j++)
+		{
+			float thetaChange2 = thetaChange * (j + 1);
+			//glm::quat q = glm::quat(glm::vec3(glm::radians(thetaChange1), glm::radians(thetaChange2), 0.f));
+			//glm::quat q = glm::quat(glm::vec3(glm::radians(thetaChange1), 0.f, 0.f));
+
+			glm::vec3 rotated = initial;
+			rotated = rotated * glm::quat(glm::vec3(glm::radians(thetaChange1), 0.f, 0.f));
+			rotated = rotated * glm::quat(glm::vec3(0.f, glm::radians(thetaChange2), 0.f));
+			rotated = glm::normalize(rotated);
+
+			vertices[2 + (details * i) + j] = Vertex(
+				//glm::normalize(initial * q),
+				rotated,
+				glm::vec3(1.f, 1.f, 1.f),
+				//glm::normalize((initial * q) - glm::vec3(0.f)),
+				glm::normalize(rotated),
+				glm::vec2(1.f - (1.f / details) * j, 1.f - (1.f / details) * i)
+			);
+
+			int offset = (j + (details * i) + 2);
+			int secondOffset = j < details - 1 ? 1 : -j;
+
+			if (i > 0 && i < details - 1)
+			{
+				elements.emplace_back(offset + secondOffset);
+				elements.emplace_back(offset);
+				elements.emplace_back(offset + secondOffset + details);
+
+				elements.emplace_back(offset + secondOffset + details);
+				elements.emplace_back(offset);
+				elements.emplace_back(offset + details);
+			}
+			else if(i == 0)
+			{
+				
+				elements.emplace_back(0);
+				elements.emplace_back(offset);
+				elements.emplace_back(offset + secondOffset);
+				
+			}
+			else if (i < details - 1)
+			{
+				
+				elements.emplace_back(offset + secondOffset);
+				elements.emplace_back(offset);
+				elements.emplace_back(1);
+				
+			}
+		}
+	}
+
+	Model m(std::move(vertices), std::move(elements));
+
+	GLModel glModel(std::move(m));
+
+	glModel.SetUpMesh();
+
+	Models.emplace(2, std::move(glModel));
 }

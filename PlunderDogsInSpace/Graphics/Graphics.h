@@ -61,6 +61,8 @@ protected:
 
 struct Vertex
 {
+	Vertex() : position(glm::vec3(0.f)), color(glm::vec3(0.f)), normal(glm::vec3(0.f)), texCoords(glm::vec2(0.f))
+	{}
 	Vertex(const glm::vec3& Position, const glm::vec3& Color, const glm::vec3& Normal, const glm::vec2& TexCoords) :
 		position(Position), color(Color), normal(Normal), texCoords(TexCoords)
 	{}
@@ -202,6 +204,7 @@ private:
 	void GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& forward, const float forwardAmount, const glm::vec3& up, const float size, const int elementOffset = 0, const glm::vec3& positionOffset = glm::vec3(0.f), const glm::vec3& color = glm::vec3(1.f));
 	void LoadPlane(std::unordered_map<unsigned int, GLModel>& Models);
 	void LoadBox(std::unordered_map<unsigned int, GLModel>& Models);
+	void LoadSphere(std::unordered_map<unsigned int, GLModel>& Models);
 };
 
 class GLGraphics : public Graphics
