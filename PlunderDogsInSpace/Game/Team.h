@@ -12,8 +12,24 @@ struct Projectile
 	int modelID;
 };
 
-constexpr Projectile DefaultGunProjectile{ 10.f, 1.f, 1 };
-constexpr Projectile DefaultCannonProjectile{ 50.f, 0.5f, 1 };
+struct ShotProjectile
+{
+	ShotProjectile(const Projectile& Projectile, const glm::vec3& Direction, float Lifetime = 10.f) : projectile(&Projectile), direction(Direction), currentLifetime(0.f), lifeTime(Lifetime), transform(), markedForDeletion(false)
+	{
+		transform.SetScale(glm::vec3(0.2f));
+	}
+	const Projectile* projectile;
+	glm::vec3 direction;
+	float currentLifetime;
+	float lifeTime;
+	Transform transform;
+	bool markedForDeletion;
+	void Update();
+	void EndOfFrame();
+};
+
+constexpr Projectile DefaultGunProjectile{ 10.f, 1.f, 2 };
+constexpr Projectile DefaultCannonProjectile{ 50.f, 0.5f, 2 };
 
 struct Weapon
 {
@@ -25,6 +41,17 @@ struct Weapon
 
 constexpr Weapon DefaultGun{ DefaultGunProjectile, 1.f, 5.f, 1 };
 constexpr Weapon DefaultCannon{ DefaultCannonProjectile, 5.f, 20.f, 1 };
+
+struct EquippedWeapon
+{
+	EquippedWeapon() : weapon(nullptr), currentReload(0.f), hasShot(false)
+	{}
+	const Weapon* weapon;
+	float currentReload;
+	bool hasShot;
+	void Update();
+	void Shoot(Team* OwningTeam, const glm::vec3& Direction, const glm::vec3& Position);
+};
 
 struct ShipAIData
 {
@@ -50,17 +77,17 @@ struct Ship
 	{
 		return m_shipAIData;
 	}
-	const Weapon* GetWeapon()
+	EquippedWeapon& GetWeapon()
 	{
 		return m_weapon;
 	}
 	void SetWeapon(const Weapon& NewWeapon)
 	{
-		m_weapon = &NewWeapon;
+		m_weapon.weapon = &NewWeapon;
 	}
 protected:
 	ShipAIData m_shipAIData;
-	const Weapon* m_weapon;
+	EquippedWeapon m_weapon;
 };
 
 class Team
@@ -80,11 +107,16 @@ public:
 	{
 		return m_ships;
 	}
+	std::vector<ShotProjectile>& GetProjectiles()
+	{
+		return m_projectiles;
+	}
 	friend class Ship;
 protected:
 	glm::vec3 m_startPosition;
 	Team* m_otherTeamRef;
 	std::vector<Ship> m_ships;
+	std::vector<ShotProjectile> m_projectiles;
 	bool isAI;
 };
 
@@ -133,13 +165,13 @@ class BTShipSetMoveToLocation : public BTDecoratorNode
 			return BTNodeResult::eBTSuccess;
 		}
 
-		if (data->owner->GetWeapon() == nullptr)
+		if (data->owner->GetWeapon().weapon == nullptr)
 		{
 			data->targetLocation = data->owner->m_transform.GetPosition();
 			return BTNodeResult::eBTSuccess;
 		}
 
-		if (glm::length(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()) < data->owner->GetWeapon()->range)
+		if (glm::length(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()) < data->owner->GetWeapon().weapon->range)
 		{
 			data->targetLocation = data->owner->m_transform.GetPosition();
 			return BTNodeResult::eBTSuccess;
@@ -165,5 +197,25 @@ class BTShipMoveToLocation : public BTDecoratorNode
 		}
 
 		return BTNodeResult::eBTSuccess;
+	}
+};
+
+class BTShipShootAtTarget : public BTDecoratorNode
+{
+	virtual BTNodeResult Evaluate(void* ptr = nullptr)
+	{
+		if (ptr == nullptr)
+			return BTNodeResult::eBTFail;
+
+		ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+		if (data->targetShip == nullptr)
+			return BTNodeResult::eBTFail;
+
+		if (glm::length(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()) < data->owner->GetWeapon().weapon->range)
+		{
+			data->owner->GetWeapon().Shoot(data->owningTeam, glm::normalize(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()), data->owner->m_transform.GetPosition());
+			return BTNodeResult::eBTSuccess;
+		}
 	}
 };

@@ -1,10 +1,35 @@
 #include "Team.h"
+#include <stack>
 
-Ship::Ship() : ModelID(1), m_transform(), m_body(), m_tree(std::move(new BTSequenceNode)), m_shipAIData(this), m_weapon(nullptr)
+void EquippedWeapon::Update()
+{
+	if (hasShot)
+	{
+		currentReload += ServiceLocator::GetTimeService().deltaTime;
+		if (currentReload >= weapon->reloadSpeed)
+		{
+			currentReload = 0.f;
+			hasShot = false;
+		}
+	}
+}
+
+void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const glm::vec3& Position)
+{
+	if (!hasShot)
+	{
+		hasShot = true;
+		OwningTeam->GetProjectiles().emplace_back(ShotProjectile(weapon->projectile, Direction));
+		OwningTeam->GetProjectiles().back().transform.SetPosition(Position);
+	}
+}
+
+Ship::Ship() : ModelID(1), m_transform(), m_body(), m_tree(std::move(new BTSequenceNode)), m_shipAIData(this), m_weapon()
 {
 	m_tree.GetRoot()->AddChild(std::move(new BTShipFindTarget));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipSetMoveToLocation));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipMoveToLocation));
+	m_tree.GetRoot()->AddChild(std::move(new BTShipShootAtTarget));
 }
 
 void Ship::Init(Team* OwningTeam)
@@ -19,31 +44,9 @@ void Ship::Update()
 	m_body.ApplyPhysics(ServiceLocator::GetTimeService().deltaTime, m_transform);
 	m_transform.CheckModelXForm();
 
+	m_weapon.Update();
+
 	m_tree.Evaluate(&m_shipAIData);
-	/*
-	if (m_shipAIData.targetShip == nullptr)
-	{
-		if (m_shipAIData.owningTeam->m_otherTeamRef->m_ships.size() == 0)
-			return;
-		float closest = 999999.f;
-
-		Ship* closestShip = nullptr;
-
-		for (Ship& s : m_shipAIData.owningTeam->m_otherTeamRef->m_ships)
-		{
-			float distance = glm::length(s.m_transform.GetPosition() - m_transform.GetPosition());
-			if (distance < closest) 
-			{
-				closestShip = &s;
-				closest = distance;
-			}
-		}
-		m_shipAIData.targetShip = closestShip;
-	}
-	else
-	{
-		m_transform.Move(glm::normalize(m_shipAIData.targetShip->m_transform.GetPosition() - m_transform.GetPosition()) * ServiceLocator::GetTimeService().deltaTime);
-	}*/
 }
 
 void Ship::Render()
@@ -91,6 +94,10 @@ void Team::Update()
 	{
 		s.Update();
 	}
+	for (ShotProjectile& p : m_projectiles)
+	{
+		p.Update();
+	}
 }
 
 void Team::Render()
@@ -98,6 +105,12 @@ void Team::Render()
 	for (Ship& s : m_ships)
 	{
 		s.Render();
+	}
+	for (ShotProjectile& p : m_projectiles)
+	{
+		p.transform.CheckModelXForm();
+		DefaultGraphics& graphics = ServiceLocator::GetGraphics();
+		graphics.Render(p.projectile->modelID, 0, true, p.transform.GetModelXform());
 	}
 }
 
@@ -107,8 +120,43 @@ void Team::EndOfFrame()
 	{
 		s.EndOfFrame();
 	}
+	for (ShotProjectile& p : m_projectiles)
+	{
+		p.EndOfFrame();
+	}
+	
+	std::stack<int> toDelete;
+
+	for (int i = 0; i < m_projectiles.size(); i++)
+	{
+		if (m_projectiles[i].markedForDeletion)
+		{
+			toDelete.emplace(i);
+		}
+	}
+	while (!toDelete.empty())
+	{
+		int index = toDelete.top();
+		toDelete.pop();
+		m_projectiles.erase(m_projectiles.begin() + index);
+	}
 }
 
 ShipAIData::ShipAIData(Ship* Owner) : owningTeam(nullptr), owner(Owner), targetShip(nullptr), targetLocation(glm::vec3(0.f))
 {
+}
+
+void ShotProjectile::Update()
+{
+	currentLifetime += ServiceLocator::GetTimeService().deltaTime;
+	if (currentLifetime >= lifeTime)
+	{
+		markedForDeletion = true;
+	}
+	transform.Move(direction * ServiceLocator::GetTimeService().deltaTime);
+}
+
+void ShotProjectile::EndOfFrame()
+{
+	transform.EndFrame();
 }
