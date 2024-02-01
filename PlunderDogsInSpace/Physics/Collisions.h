@@ -45,6 +45,10 @@ struct AABB
 
 struct SphereCollider
 {
+	SphereCollider() : radius(0.f)
+	{}
+	SphereCollider(float Radius) : radius(Radius)
+	{}
 	float radius;
 };
 

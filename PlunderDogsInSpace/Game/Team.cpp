@@ -24,7 +24,7 @@ void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const g
 	}
 }
 
-Ship::Ship() : ModelID(1), m_transform(), m_body(), m_tree(std::move(new BTSequenceNode)), m_shipAIData(this), m_weapon()
+Ship::Ship() : ModelID(1), m_transform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), m_shipAIData(this), m_weapon()
 {
 	m_tree.GetRoot()->AddChild(std::move(new BTShipFindTarget));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipSetMoveToLocation));
@@ -97,6 +97,17 @@ void Team::Update()
 	for (ShotProjectile& p : m_projectiles)
 	{
 		p.Update();
+		for (Ship& s : m_otherTeamRef->m_ships)
+		{
+			CollisionData data;
+			data.t = &p.transform;
+			data.otherT = &s.m_transform;
+			SphereToSphere(p.collider, s.m_collider, data);
+			if (data.hasHit)
+			{
+				p.markedForDeletion = true;
+			}
+		}
 	}
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "../Core/ServiceLocator.h"
 #include "../AI/BehaviourTree.h"
+#include "../Physics/Collisions.h"
 
 class Team;
 struct Ship;
@@ -14,7 +15,7 @@ struct Projectile
 
 struct ShotProjectile
 {
-	ShotProjectile(const Projectile& Projectile, const glm::vec3& Direction, float Lifetime = 10.f) : projectile(&Projectile), direction(Direction), currentLifetime(0.f), lifeTime(Lifetime), transform(), markedForDeletion(false)
+	ShotProjectile(const Projectile& Projectile, const glm::vec3& Direction, float Lifetime = 10.f) : projectile(&Projectile), direction(Direction), currentLifetime(0.f), lifeTime(Lifetime), transform(), collider(0.2f), markedForDeletion(false)
 	{
 		transform.SetScale(glm::vec3(0.2f));
 	}
@@ -23,6 +24,7 @@ struct ShotProjectile
 	float currentLifetime;
 	float lifeTime;
 	Transform transform;
+	SphereCollider collider;
 	bool markedForDeletion;
 	void Update();
 	void EndOfFrame();
@@ -68,6 +70,7 @@ struct Ship
 	unsigned int ModelID;
 	Transform m_transform;
 	RigidBody m_body;
+	SphereCollider m_collider;
 	BehaviourTree m_tree;
 	void Init(Team* OwningTeam);
 	void Update();
