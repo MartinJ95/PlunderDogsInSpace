@@ -481,7 +481,7 @@ void GLModelLoading::LoadSphere(std::unordered_map<unsigned int, GLModel>& Model
 	{
 		glm::vec3 initial = glm::vec3(0.f, 1.f, 0.f);
 		
-		float thetaChange1 = thetaChange * (i + 1);
+		float thetaChange1 = (thetaChange * (i + 1))*0.5;
 
 		for (int j = 0; j < details; j++)
 		{
