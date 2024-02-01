@@ -88,3 +88,14 @@ static void RayToPlane(const Ray& Raycast, const PlaneCollider& Plane, Collision
 	}
 }
 static void RayToSphere(const Ray& Raycast, const SphereCollider& Sphere, CollisionData& Data);
+static void SphereToSphere(const SphereCollider& obj, const SphereCollider& other, CollisionData& Data)
+{
+	glm::vec3 ObjToOther = Data.otherT->GetPosition() - Data.t->GetPosition();
+	if (glm::length(ObjToOther) < obj.radius + other.radius)
+	{
+		Data.hasHit = true;
+		Data.collisionNormal = glm::normalize(ObjToOther);
+		Data.penetrationDepth = (obj.radius + other.radius) - glm::length(ObjToOther);
+		Data.pointOfCollision = Data.otherT->GetPosition() + glm::normalize(-ObjToOther) * (Data.penetrationDepth + other.radius);
+	}
+}
