@@ -58,20 +58,71 @@ struct EquippedWeapon
 struct ShipAIData
 {
 	ShipAIData(Ship* Owner);
+	ShipAIData(const ShipAIData& other) : owningTeam(other.owningTeam), owner(other.owner), targetShip(other.targetShip), targetLocation(other.targetLocation)
+	{}
+	void operator=(const ShipAIData& other)
+	{
+		owningTeam = other.owningTeam;
+		owner = other.owner;
+		targetShip = other.targetShip;
+		targetLocation = other.targetLocation;
+	}
 	Team* owningTeam;
 	Ship* owner;
 	Ship* targetShip;
 	glm::vec3 targetLocation;
 };
 
+struct ShipClass
+{
+	float health;
+	float speed;
+	const Weapon& weapon;
+};
+
+constexpr ShipClass Fighter{ 15.f, 2.f, DefaultGun };
+constexpr ShipClass Cruiser{ 50.f, 1.f, DefaultCannon };
+
 struct Ship
 {
 	Ship();
+	Ship(const Ship& other);
+	Ship(Ship&& other);
+	void operator=(const Ship& other)
+	{
+		ModelID = other.ModelID;
+		m_transform = other.m_transform;
+		m_body = other.m_body;
+		m_collider = other.m_collider;
+		m_tree = other.m_tree;
+		currentHealth = other.currentHealth;
+		markedForDeletion = other.markedForDeletion;
+		m_shipAIData = other.m_shipAIData;
+		m_shipAIData.owner = this;
+		m_class = other.m_class;
+		m_weapon = other.m_weapon;
+	}
+	void operator=(Ship&& other)
+	{
+		ModelID = other.ModelID;
+		m_transform = other.m_transform;
+		m_body = other.m_body;
+		m_collider = other.m_collider;
+		m_tree = std::move(other.m_tree);
+		currentHealth = other.currentHealth;
+		markedForDeletion = other.markedForDeletion;
+		m_shipAIData = other.m_shipAIData;
+		m_shipAIData.owner = this;
+		m_class = other.m_class;
+		m_weapon = other.m_weapon;
+	}
 	unsigned int ModelID;
 	Transform m_transform;
 	RigidBody m_body;
 	SphereCollider m_collider;
 	BehaviourTree m_tree;
+	float currentHealth;
+	bool markedForDeletion;
 	void Init(Team* OwningTeam);
 	void Update();
 	void Render();
@@ -79,6 +130,16 @@ struct Ship
 	ShipAIData& GetShipAIData() 
 	{
 		return m_shipAIData;
+	}
+	const ShipClass* GetClass() const
+	{
+		return m_class;
+	}
+	void SetClass(const ShipClass& Class)
+	{
+		m_class = &Class;
+		currentHealth = Class.health;
+		SetWeapon(m_class->weapon);
 	}
 	EquippedWeapon& GetWeapon()
 	{
@@ -88,8 +149,17 @@ struct Ship
 	{
 		m_weapon.weapon = &NewWeapon;
 	}
+	void TakeDamage(const float DamageRecieved)
+	{
+		currentHealth -= DamageRecieved;
+		if (currentHealth < m_class->health)
+		{
+			markedForDeletion = true;
+		}
+	}
 protected:
 	ShipAIData m_shipAIData;
+	const ShipClass* m_class;
 	EquippedWeapon m_weapon;
 };
 
@@ -132,7 +202,7 @@ class BTShipFindTarget : public BTDecoratorNode
 
 		ShipAIData* data = static_cast<ShipAIData*>(ptr);
 
-		if (data->targetShip == nullptr || data->owningTeam->GetOtherTeam()->GetShips().size() != 0)
+		if (data->targetShip == nullptr && data->owningTeam->GetOtherTeam()->GetShips().size() != 0)
 		{
 			float closest = 999999.f;
 

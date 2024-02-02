@@ -24,12 +24,26 @@ void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const g
 	}
 }
 
-Ship::Ship() : ModelID(1), m_transform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), m_shipAIData(this), m_weapon()
+Ship::Ship() : ModelID(1), m_transform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon()
 {
 	m_tree.GetRoot()->AddChild(std::move(new BTShipFindTarget));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipSetMoveToLocation));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipMoveToLocation));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipShootAtTarget));
+}
+
+Ship::Ship(const Ship& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_body(other.m_body),
+m_collider(other.m_collider), m_tree(other.m_tree), currentHealth(other.currentHealth),
+markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon)
+{
+	m_shipAIData.owner = this;
+}
+
+Ship::Ship(Ship&& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_body(other.m_body),
+m_collider(other.m_collider), m_tree(std::move(other.m_tree)), currentHealth(other.currentHealth),
+markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon)
+{
+	m_shipAIData.owner = this;
 }
 
 void Ship::Init(Team* OwningTeam)
@@ -39,7 +53,7 @@ void Ship::Init(Team* OwningTeam)
 
 void Ship::Update()
 {
-	m_tree.Evaluate();
+	m_tree.Evaluate(&m_shipAIData);
 
 	m_body.ApplyPhysics(ServiceLocator::GetTimeService().deltaTime, m_transform);
 	m_transform.CheckModelXForm();
@@ -84,7 +98,8 @@ void Team::Init(Team* Other)
 		m_ships.back().m_transform.SetPosition(startShipPos + sideVec * (shipSpacing * i));
 		m_ships.back().Init(this);
 		m_ships.back().EndOfFrame();
-		m_ships.back().SetWeapon((i % 2 == 0 ? DefaultGun : DefaultCannon));
+		m_ships.back().SetClass((i % 2 == 0 ? Fighter : Cruiser));
+		//m_ships.back().SetWeapon((i % 2 == 0 ? DefaultGun : DefaultCannon));
 	}
 }
 
@@ -106,6 +121,7 @@ void Team::Update()
 			if (data.hasHit)
 			{
 				p.markedForDeletion = true;
+				s.TakeDamage(p.projectile->damage);
 			}
 		}
 	}
@@ -150,6 +166,27 @@ void Team::EndOfFrame()
 		int index = toDelete.top();
 		toDelete.pop();
 		m_projectiles.erase(m_projectiles.begin() + index);
+	}
+
+	for (int i = 0; i < m_ships.size(); i++)
+	{
+		if (m_ships[i].markedForDeletion)
+		{
+			toDelete.emplace(i);
+		}
+	}
+	if (!toDelete.empty())
+	{
+		for (Ship& s : m_ships)
+		{
+			s.GetShipAIData().targetShip = nullptr;
+		}
+	}
+	while (!toDelete.empty())
+	{
+		int index = toDelete.top();
+		toDelete.pop();
+		m_ships.erase(m_ships.begin() + index);
 	}
 }
 
