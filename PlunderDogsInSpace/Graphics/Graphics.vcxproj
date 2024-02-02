@@ -149,6 +149,8 @@
     <None Include="default2DShader.vs" />
     <None Include="default3DShader.fs" />
     <None Include="default3DShader.vs" />
+    <None Include="HealthBarShader.fs" />
+    <None Include="HealthBarShader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

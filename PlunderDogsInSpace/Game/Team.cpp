@@ -24,26 +24,30 @@ void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const g
 	}
 }
 
-Ship::Ship() : ModelID(1), m_transform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon()
+Ship::Ship() : ModelID(1), m_transform(), m_healthbarTransform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon()
 {
 	m_tree.GetRoot()->AddChild(std::move(new BTShipFindTarget));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipSetMoveToLocation));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipMoveToLocation));
 	m_tree.GetRoot()->AddChild(std::move(new BTShipShootAtTarget));
+
+	m_healthbarTransform.SetScale(HealthbarScale);
 }
 
-Ship::Ship(const Ship& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_body(other.m_body),
+Ship::Ship(const Ship& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_healthbarTransform(other.m_healthbarTransform), m_body(other.m_body),
 m_collider(other.m_collider), m_tree(other.m_tree), currentHealth(other.currentHealth),
 markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon)
 {
 	m_shipAIData.owner = this;
+	m_healthbarTransform.SetScale(HealthbarScale);
 }
 
-Ship::Ship(Ship&& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_body(other.m_body),
+Ship::Ship(Ship&& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_healthbarTransform(other.m_healthbarTransform), m_body(other.m_body),
 m_collider(other.m_collider), m_tree(std::move(other.m_tree)), currentHealth(other.currentHealth),
 markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon)
 {
 	m_shipAIData.owner = this;
+	m_healthbarTransform.SetScale(HealthbarScale);
 }
 
 void Ship::Init(Team* OwningTeam)
@@ -58,6 +62,9 @@ void Ship::Update()
 	m_body.ApplyPhysics(ServiceLocator::GetTimeService().deltaTime, m_transform);
 	m_transform.CheckModelXForm();
 
+	m_healthbarTransform.SetPosition(m_transform.GetPosition() + (-ServiceLocator::GetGraphics().GetCamera().GetCameraUp() * 3.f));
+	m_healthbarTransform.CheckModelXForm();
+
 	m_weapon.Update();
 
 	m_tree.Evaluate(&m_shipAIData);
@@ -70,11 +77,22 @@ void Ship::Render()
 	graphics.GetShader(0).SetRender3D(graphics.GetCamera());
 
 	graphics.Render(ModelID, 0, true, m_transform.GetModelXform());
+
+	graphics.GetShader(2).SetRender3D(graphics.GetCamera());
+
+	graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "health", currentHealth);
+
+	graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "totalHealth", m_class->health);
+
+	graphics.Render(0, 2, true, m_healthbarTransform.GetModelXform());
+
+	graphics.GetShader(0).SetRender3D(graphics.GetCamera());
 }
 
 void Ship::EndOfFrame()
 {
 	m_transform.EndFrame();
+	m_healthbarTransform.EndFrame();
 }
 
 Team::Team(glm::vec3 StartPos, bool IsAI) : m_startPosition(StartPos), m_otherTeamRef(nullptr), m_ships(), isAI(IsAI)

@@ -34,5 +34,7 @@
     <None Include="default3DShader.vs" />
     <None Include="clickIndicator.fs" />
     <None Include="clickIndicator.vs" />
+    <None Include="HealthBarShader.fs" />
+    <None Include="HealthBarShader.vs" />
   </ItemGroup>
 </Project>

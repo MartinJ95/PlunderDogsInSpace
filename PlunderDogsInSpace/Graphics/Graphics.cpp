@@ -64,6 +64,7 @@ bool GLGraphics::Init()
 
 	m_shaders.emplace(0, GLShader("default3DShader.vs", "default3DShader.fs"));
 	m_shaders.emplace(1, GLShader("clickIndicator.vs", "clickIndicator.fs"));
+	m_shaders.emplace(2, GLShader("HealthBarShader.vs", "HealthBarShader.fs"));
 
 	GLModelLoading modelLoader;
 

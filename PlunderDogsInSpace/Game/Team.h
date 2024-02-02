@@ -80,8 +80,10 @@ struct ShipClass
 	const Weapon& weapon;
 };
 
-constexpr ShipClass Fighter{ 15.f, 2.f, DefaultGun };
-constexpr ShipClass Cruiser{ 50.f, 1.f, DefaultCannon };
+constexpr ShipClass Fighter{ 50.f, 2.f, DefaultGun };
+constexpr ShipClass Cruiser{ 150.f, 1.f, DefaultCannon };
+
+constexpr glm::vec3 HealthbarScale = glm::vec3(1.f, 1.f, 0.2f);
 
 struct Ship
 {
@@ -92,6 +94,8 @@ struct Ship
 	{
 		ModelID = other.ModelID;
 		m_transform = other.m_transform;
+		m_healthbarTransform = other.m_healthbarTransform;
+		m_healthbarTransform.SetScale(HealthbarScale);
 		m_body = other.m_body;
 		m_collider = other.m_collider;
 		m_tree = other.m_tree;
@@ -106,6 +110,8 @@ struct Ship
 	{
 		ModelID = other.ModelID;
 		m_transform = other.m_transform;
+		m_healthbarTransform = other.m_healthbarTransform;
+		m_healthbarTransform.SetScale(HealthbarScale);
 		m_body = other.m_body;
 		m_collider = other.m_collider;
 		m_tree = std::move(other.m_tree);
@@ -118,6 +124,7 @@ struct Ship
 	}
 	unsigned int ModelID;
 	Transform m_transform;
+	Transform m_healthbarTransform;
 	RigidBody m_body;
 	SphereCollider m_collider;
 	BehaviourTree m_tree;
@@ -152,7 +159,7 @@ struct Ship
 	void TakeDamage(const float DamageRecieved)
 	{
 		currentHealth -= DamageRecieved;
-		if (currentHealth < m_class->health)
+		if (currentHealth <= 0)
 		{
 			markedForDeletion = true;
 		}

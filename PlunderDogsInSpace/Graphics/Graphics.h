@@ -49,6 +49,13 @@ public:
 		q = q * glm::conjugate(rotator);
 		return glm::vec3(q.x, q.y, q.z);
 	}
+	glm::vec3 GetCameraUp()
+	{
+		glm::vec3 camDir = glm::normalize(GetViewDir());
+		float d = glm::dot(camDir, glm::vec3(1, 0, 0));
+		glm::vec3 side = d < -0.8f || d > 0.8f ? glm::vec3(0, 0, 1) : glm::vec3(1, 0, 0);
+		return glm::normalize(glm::cross(camDir, side));
+	}
 	float GetFOV() const
 	{
 		return m_fov;
