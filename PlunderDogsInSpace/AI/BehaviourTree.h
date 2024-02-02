@@ -42,6 +42,17 @@ class BehaviourTree
 {
 public:
 	BehaviourTree(BTSelectorNode*&& node);
+	BehaviourTree(const BehaviourTree& other);
+	BehaviourTree(BehaviourTree&& other);
+	void operator=(const BehaviourTree& other)
+	{
+		m_root = other.m_root;
+	}
+	void operator=(BehaviourTree&& other)
+	{
+		m_root = other.m_root;
+		other.m_root = nullptr;
+	}
 	~BehaviourTree();
 public:
 	BTNodeResult Evaluate(void* ptr = nullptr);

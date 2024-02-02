@@ -50,8 +50,20 @@ BehaviourTree::BehaviourTree(BTSelectorNode*&& node) : m_root(std::move(node))
 {
 }
 
+BehaviourTree::BehaviourTree(const BehaviourTree& other) : m_root(other.m_root)
+{
+}
+
+BehaviourTree::BehaviourTree(BehaviourTree&& other) : m_root(other.m_root)
+{
+    other.m_root = nullptr;
+}
+
 BehaviourTree::~BehaviourTree()
 {
+    if (m_root == nullptr)
+        return;
+
     delete m_root;
 }
 
