@@ -15,7 +15,7 @@ struct Projectile
 
 struct ShotProjectile
 {
-	ShotProjectile(const Projectile& Projectile, const glm::vec3& Direction, float Lifetime = 10.f) : projectile(&Projectile), direction(Direction), currentLifetime(0.f), lifeTime(Lifetime), transform(), collider(0.2f), markedForDeletion(false)
+	ShotProjectile(const Projectile& Projectile, const glm::vec3& Direction, float Lifetime = 50.f) : projectile(&Projectile), direction(Direction), currentLifetime(0.f), lifeTime(Lifetime), transform(), collider(0.2f), markedForDeletion(false)
 	{
 		transform.SetScale(glm::vec3(0.2f));
 	}
