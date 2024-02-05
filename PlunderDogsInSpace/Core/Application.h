@@ -10,16 +10,18 @@ typedef NullGraphics DefaultGraphics;
 
 struct TimeManager
 {
-	TimeManager() : lastUpdate(std::chrono::steady_clock::now()), deltaTime(0.f)
+	TimeManager() : lastUpdate(std::chrono::steady_clock::now()), deltaTime(0.f), totalTime(0.f)
 	{}
 	void TimeStep()
 	{
 		auto now = std::chrono::steady_clock::now();
 		deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(now - lastUpdate).count() / 1000000.f;
 		lastUpdate = now;
+		totalTime += deltaTime;
 	}
 	std::chrono::steady_clock::time_point lastUpdate;
 	float deltaTime;
+	float totalTime;
 };
 
 class Application
