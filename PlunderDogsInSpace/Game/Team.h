@@ -200,9 +200,9 @@ protected:
 	bool isAI;
 };
 
-class BTShipFindTarget : public BTDecoratorNode
+struct BTShipFindTarget : public BTAction
 {
-	virtual BTNodeResult Evaluate(void* ptr = nullptr)
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override
 	{
 		if (ptr == nullptr)
 			return BTNodeResult::eBTFail;
@@ -230,9 +230,9 @@ class BTShipFindTarget : public BTDecoratorNode
 	}
 };
 
-class BTShipSetMoveToLocation : public BTDecoratorNode
+struct BTShipSetMoveToLocation : public BTAction
 {
-	virtual BTNodeResult Evaluate(void* ptr = nullptr)
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override
 	{
 		if (ptr == nullptr)
 			return BTNodeResult::eBTFail;
@@ -262,9 +262,9 @@ class BTShipSetMoveToLocation : public BTDecoratorNode
 	}
 };
 
-class BTShipMoveToLocation : public BTDecoratorNode
+struct BTShipMoveToLocation : public BTAction
 {
-	virtual BTNodeResult Evaluate(void* ptr = nullptr) override
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override
 	{
 		if (ptr == nullptr)
 			return BTNodeResult::eBTFail;
@@ -280,9 +280,9 @@ class BTShipMoveToLocation : public BTDecoratorNode
 	}
 };
 
-class BTShipShootAtTarget : public BTDecoratorNode
+struct BTShipShootAtTarget : public BTAction
 {
-	virtual BTNodeResult Evaluate(void* ptr = nullptr)
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override
 	{
 		if (ptr == nullptr)
 			return BTNodeResult::eBTFail;
@@ -299,3 +299,8 @@ class BTShipShootAtTarget : public BTDecoratorNode
 		}
 	}
 };
+
+constexpr BTShipFindTarget BTShipFindTargetObj;
+constexpr BTShipSetMoveToLocation BTShipSetMoveToLocationObj;
+constexpr BTShipMoveToLocation BTShipMoveToLocationObj;
+constexpr BTShipShootAtTarget BTShipShootAtTargetObj;

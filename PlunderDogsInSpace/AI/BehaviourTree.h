@@ -31,10 +31,18 @@ public:
 	virtual BTNodeResult Evaluate(void* ptr = nullptr) override final;
 };
 
+struct BTAction
+{
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const = 0;
+};
+
 class BTDecoratorNode : public BTNode
 {
 public:
-	virtual BTNodeResult Evaluate(void* ptr = nullptr) override = 0;
+	BTDecoratorNode(const BTAction* Action) : m_action(Action) {}
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) override;
+public:
+	const BTAction* m_action;
 };
 
 

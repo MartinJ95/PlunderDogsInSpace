@@ -21,16 +21,12 @@ void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const g
 		hasShot = true;
 		OwningTeam->GetProjectiles().emplace_back(ShotProjectile(weapon->projectile, Direction));
 		OwningTeam->GetProjectiles().back().transform.SetPosition(Position);
+		OwningTeam->GetProjectiles().back().transform.EndFrame();
 	}
 }
 
 Ship::Ship() : ModelID(1), m_transform(), m_healthbarTransform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon()
 {
-	m_tree.GetRoot()->AddChild(std::move(new BTShipFindTarget));
-	m_tree.GetRoot()->AddChild(std::move(new BTShipSetMoveToLocation));
-	m_tree.GetRoot()->AddChild(std::move(new BTShipMoveToLocation));
-	m_tree.GetRoot()->AddChild(std::move(new BTShipShootAtTarget));
-
 	m_healthbarTransform.SetScale(HealthbarScale);
 }
 
@@ -53,6 +49,15 @@ markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_
 void Ship::Init(Team* OwningTeam)
 {
 	m_shipAIData.owningTeam = OwningTeam;
+
+	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipFindTargetObj)));
+	if (OwningTeam->isAI)
+	{
+		m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipSetMoveToLocationObj)));
+	}
+	//m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipSetMoveToLocationObj)));
+	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipMoveToLocationObj)));
+	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipShootAtTargetObj)));
 }
 
 void Ship::Update()
@@ -116,6 +121,7 @@ void Team::Init(Team* Other)
 		m_ships.back().m_transform.SetPosition(startShipPos + sideVec * (shipSpacing * i));
 		m_ships.back().Init(this);
 		m_ships.back().EndOfFrame();
+		m_ships.back().GetShipAIData().targetLocation = m_ships.back().m_transform.GetPosition();
 		m_ships.back().SetClass((i % 2 == 0 ? Fighter : Cruiser));
 		//m_ships.back().SetWeapon((i % 2 == 0 ? DefaultGun : DefaultCannon));
 	}

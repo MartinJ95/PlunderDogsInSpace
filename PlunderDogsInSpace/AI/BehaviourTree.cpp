@@ -76,3 +76,8 @@ BTSelectorNode* BehaviourTree::GetRoot()
 {
     return m_root;
 }
+
+BTNodeResult BTDecoratorNode::Evaluate(void* ptr)
+{
+    return m_action->Evaluate(ptr);
+}
