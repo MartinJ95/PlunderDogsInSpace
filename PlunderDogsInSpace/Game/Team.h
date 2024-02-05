@@ -30,8 +30,8 @@ struct ShotProjectile
 	void EndOfFrame();
 };
 
-constexpr Projectile DefaultGunProjectile{ 10.f, 1.f, 2 };
-constexpr Projectile DefaultCannonProjectile{ 50.f, 0.5f, 2 };
+constexpr Projectile DefaultGunProjectile{ 10.f, 1.f, 3 };
+constexpr Projectile DefaultCannonProjectile{ 50.f, 0.5f, 3 };
 
 struct Weapon
 {
@@ -41,8 +41,8 @@ struct Weapon
 	int medelID;
 };
 
-constexpr Weapon DefaultGun{ DefaultGunProjectile, 1.f, 5.f, 1 };
-constexpr Weapon DefaultCannon{ DefaultCannonProjectile, 5.f, 20.f, 1 };
+constexpr Weapon DefaultGun{ DefaultGunProjectile, 1.f, 5.f, 2 };
+constexpr Weapon DefaultCannon{ DefaultCannonProjectile, 5.f, 20.f, 2 };
 
 struct EquippedWeapon
 {
@@ -100,11 +100,12 @@ struct Ship
 		m_collider = other.m_collider;
 		m_tree = other.m_tree;
 		currentHealth = other.currentHealth;
-		markedForDeletion = other.markedForDeletion;
 		m_shipAIData = other.m_shipAIData;
 		m_shipAIData.owner = this;
 		m_class = other.m_class;
 		m_weapon = other.m_weapon;
+		markedForDeletion = other.markedForDeletion;
+		selected = other.selected;
 	}
 	void operator=(Ship&& other)
 	{
@@ -116,11 +117,12 @@ struct Ship
 		m_collider = other.m_collider;
 		m_tree = std::move(other.m_tree);
 		currentHealth = other.currentHealth;
-		markedForDeletion = other.markedForDeletion;
 		m_shipAIData = other.m_shipAIData;
 		m_shipAIData.owner = this;
 		m_class = other.m_class;
 		m_weapon = other.m_weapon;
+		markedForDeletion = other.markedForDeletion;
+		selected = other.selected;
 	}
 	unsigned int ModelID;
 	Transform m_transform;
@@ -129,7 +131,6 @@ struct Ship
 	SphereCollider m_collider;
 	BehaviourTree m_tree;
 	float currentHealth;
-	bool markedForDeletion;
 	void Init(Team* OwningTeam);
 	void Update();
 	void Render();
@@ -164,10 +165,58 @@ struct Ship
 			markedForDeletion = true;
 		}
 	}
+	bool SelectShip(const glm::vec3& ClickPos, std::vector<Ship*>& SelectedShips)
+	{
+		SphereCollider s(1.f);
+		CollisionData data;
+
+		data.t = &m_transform;
+		Transform clickTransform;
+		clickTransform.SetPosition(ClickPos);
+		clickTransform.EndFrame();
+
+		data.otherT = &clickTransform;
+
+		SphereToSphere(m_collider, s, data);
+		
+		if (data.hasHit)
+		{
+			bool isInVector = false;
+			for (Ship* s : SelectedShips)
+			{
+				if (s == this)
+				{
+					isInVector = true;
+					break;
+				}
+			}
+			if (!isInVector)
+			{
+				SelectedShips.emplace_back(this);
+				selected = true;
+				return true;
+			}
+		}
+		return false;
+	}
+	void Deselect()
+	{
+		selected = false;
+	}
+	void MoveShip(const glm::vec3& ClickPos)
+	{
+		m_shipAIData.targetLocation = ClickPos;
+	}
+	bool IsMarkedForDelection() const
+	{
+		return markedForDeletion;
+	}
 protected:
 	ShipAIData m_shipAIData;
 	const ShipClass* m_class;
 	EquippedWeapon m_weapon;
+	bool markedForDeletion;
+	bool selected;
 };
 
 class Team

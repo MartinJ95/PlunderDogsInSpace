@@ -20,7 +20,7 @@ void PlayerController::Update()
 
     graphics.GetCamera().SetPos(graphics.GetCamera().GetPos() + (mouseMovement * TimeService.deltaTime));
 
-    if (glfwGetMouseButton(graphics.GetWindow(), GLFW_MOUSE_BUTTON_1))
+    if (glfwGetMouseButton(graphics.GetWindow(), GLFW_MOUSE_BUTTON_1) || glfwGetMouseButton(graphics.GetWindow(), GLFW_MOUSE_BUTTON_2))
     {
         Ray ray;
         ray.origin = graphics.GetCamera().GetPos();
@@ -38,9 +38,43 @@ void PlayerController::Update()
 
         if (data.hasHit)
         {
+            //glm::vec3 clickPos = ray.origin + (ray.line * 1.f);
+            glm::vec3 clickPos = data.pointOfCollision;
+
             m_clickIndicators.emplace_back();
             //m_clickIndicators.back().m_transform.SetPosition(data.pointOfCollision);
-            m_clickIndicators.back().m_transform.SetPosition(ray.origin + (ray.line * 1.f));
+            m_clickIndicators.back().m_transform.SetPosition(clickPos);
+
+            Sandbox* s = (Sandbox*)ServiceLocator::GetMainService();
+
+            if(glfwGetMouseButton(graphics.GetWindow(), GLFW_MOUSE_BUTTON_1))
+            {
+                bool selecting = false;
+
+               for (Ship& s : s->GetTeam(1).GetShips())
+               {
+                   if (s.SelectShip(clickPos, m_selectedShips))
+                   {
+                       selecting = true;
+                       break;
+                   }
+               }
+               if (!selecting)
+               {
+                   for (Ship* s : m_selectedShips)
+                   {
+                       s->Deselect();
+                   }
+                   m_selectedShips.clear();
+               }
+            }
+            else
+            {
+                for (Ship* s : m_selectedShips)
+                {
+                    s->MoveShip(clickPos);
+                }
+            }
         }
         //std::cout << data;
     }

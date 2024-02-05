@@ -1,4 +1,5 @@
 #include "Sandbox.h"
+#include "PlayerController.h"
 #include "../Physics/Collisions.h"
 
 Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team2(glm::vec3(0.f, 0.f, -25.f), true)

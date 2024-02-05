@@ -25,14 +25,15 @@ void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const g
 	}
 }
 
-Ship::Ship() : ModelID(1), m_transform(), m_healthbarTransform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon()
+Ship::Ship() : ModelID(2), m_transform(), m_healthbarTransform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), 
+currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon(), selected(false)
 {
 	m_healthbarTransform.SetScale(HealthbarScale);
 }
 
 Ship::Ship(const Ship& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_healthbarTransform(other.m_healthbarTransform), m_body(other.m_body),
 m_collider(other.m_collider), m_tree(other.m_tree), currentHealth(other.currentHealth),
-markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon)
+markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon), selected(false)
 {
 	m_shipAIData.owner = this;
 	m_healthbarTransform.SetScale(HealthbarScale);
@@ -40,7 +41,7 @@ markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_
 
 Ship::Ship(Ship&& other) : ModelID(other.ModelID), m_transform(other.m_transform), m_healthbarTransform(other.m_healthbarTransform), m_body(other.m_body),
 m_collider(other.m_collider), m_tree(std::move(other.m_tree)), currentHealth(other.currentHealth),
-markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon)
+markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_class(other.m_class), m_weapon(other.m_weapon), selected(false)
 {
 	m_shipAIData.owner = this;
 	m_healthbarTransform.SetScale(HealthbarScale);
@@ -91,6 +92,18 @@ void Ship::Render()
 
 	graphics.Render(0, 2, true, m_healthbarTransform.GetModelXform());
 
+	if (selected)
+	{
+		graphics.GetShader(3).SetRender3D(graphics.GetCamera());
+		glm::vec3 v(0, 0, 1);
+
+		v = v * glm::quat(glm::vec3(0, glm::radians(ServiceLocator::GetTimeService().totalTime*15.f), 0));
+
+		graphics.GetShader(3).m_uniforms.SetVec3(graphics.GetShader(3).GetID(), "rotatedTimeVec", v);
+
+		graphics.Render(1, 3, true, m_transform.GetModelXform());
+	}
+	
 	graphics.GetShader(0).SetRender3D(graphics.GetCamera());
 }
 
@@ -194,7 +207,7 @@ void Team::EndOfFrame()
 
 	for (int i = 0; i < m_ships.size(); i++)
 	{
-		if (m_ships[i].markedForDeletion)
+		if (m_ships[i].IsMarkedForDelection())
 		{
 			toDelete.emplace(i);
 		}
@@ -202,6 +215,10 @@ void Team::EndOfFrame()
 	if (!toDelete.empty())
 	{
 		for (Ship& s : m_ships)
+		{
+			s.GetShipAIData().targetShip = nullptr;
+		}
+		for (Ship& s : m_otherTeamRef->GetShips())
 		{
 			s.GetShipAIData().targetShip = nullptr;
 		}

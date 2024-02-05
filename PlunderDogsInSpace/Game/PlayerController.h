@@ -2,6 +2,8 @@
 #include <vector>
 #include "../Physics/Collisions.h"
 
+class Ship;
+
 struct ClickIndicator
 {
 	ClickIndicator() : m_transform(), m_meshID(0), m_currentTime(0.f), m_lifetime(0.5f), m_markedForDeletion(false)
@@ -22,5 +24,6 @@ public:
 	void EndOfFrame();
 protected:
 	std::vector<ClickIndicator> m_clickIndicators;
+	std::vector<Ship*> m_selectedShips;
 };
 
