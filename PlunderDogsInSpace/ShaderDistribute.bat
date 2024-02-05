@@ -1,4 +1,4 @@
-set list= default2DShader default3DShader clickIndicator HealthBarShader
+set list= default2DShader default3DShader clickIndicator HealthBarShader selectionCircle
 
 (for %%a in (%list%) do (
 call :DistributeShader %%a
