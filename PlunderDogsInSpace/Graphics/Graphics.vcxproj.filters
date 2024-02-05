@@ -36,5 +36,7 @@
     <None Include="clickIndicator.vs" />
     <None Include="HealthBarShader.fs" />
     <None Include="HealthBarShader.vs" />
+    <None Include="selectionCircle.fs" />
+    <None Include="selectionCircle.vs" />
   </ItemGroup>
 </Project>
