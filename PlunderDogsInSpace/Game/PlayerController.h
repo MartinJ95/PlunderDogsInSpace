@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "../Physics/Collisions.h"
+#include <iostream>
 
 class Ship;
 
@@ -30,19 +31,26 @@ enum class ClickType
 	eHeldDown
 };
 
-constexpr float ClickResetTime{ 1.f };
+constexpr float ClickResetTime{ 0.1f };
 
 struct ClickManager
 {
-	ClickManager() : initialClickLocation(glm::vec3(0.f)), finalClickLocation(glm::vec3(0.f)), currentTime(0.f), currentClickType(ClickType::eNoClick), currentClickButton(ClickButton::eNone), lock(false)
+	ClickManager() : initialClickLocation(glm::vec3(0.f)), finalClickLocation(glm::vec3(0.f)), currentTime(0.f), currentClickType(ClickType::eNoClick), currentClickButton(ClickButton::eNone), lock(false), checked(false)
 	{}
 	void OnClick(const glm::vec2& ClickLocation, const ClickButton PressedButton);
 	void OnRelease(const glm::vec2& ReleaseLocation, const ClickButton PressedButton);
 	void Update();
 	void FrameEnd();
 	void ResetClick();
-	ClickType GetCurrentClickTime() const;
-	bool GetBeingheld() const;
+	ClickType GetCurrentClickType();
+	bool GetBeingheld() const
+	{
+		return lock;
+	}
+	bool GetChecked() const
+	{
+		return checked;
+	}
 	glm::vec2 initialClickLocation;
 	glm::vec2 finalClickLocation;
 	float currentTime;
@@ -50,6 +58,7 @@ struct ClickManager
 private:
 	ClickType currentClickType;
 	bool lock;
+	bool checked;
 };
 
 class PlayerController
@@ -62,6 +71,6 @@ public:
 protected:
 	std::vector<ClickIndicator> m_clickIndicators;
 	std::vector<Ship*> m_selectedShips;
-	ClickManager clickManager;
+	ClickManager m_clickManager;
 };
 
