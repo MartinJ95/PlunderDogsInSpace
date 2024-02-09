@@ -44,7 +44,7 @@ void PlayerController::Update()
     {
         ClickType click = m_clickManager.GetCurrentClickType();
 
-        if (click == ClickType::eSingleClick || click == ClickType::eDoubleClick)
+        if ((click == ClickType::eSingleClick || click == ClickType::eDoubleClick) && !m_clickManager.GetBeingheld())
         {
             ClickButton button = m_clickManager.currentClickButton;
 
