@@ -15,6 +15,43 @@ struct ClickIndicator
 	bool m_markedForDeletion;
 };
 
+enum class ClickButton
+{
+	eNone,
+	eLeft,
+	eRight
+};
+
+enum class ClickType
+{
+	eNoClick,
+	eSingleClick,
+	eDoubleClick,
+	eHeldDown
+};
+
+constexpr float ClickResetTime{ 1.f };
+
+struct ClickManager
+{
+	ClickManager() : initialClickLocation(glm::vec3(0.f)), finalClickLocation(glm::vec3(0.f)), currentTime(0.f), currentClickType(ClickType::eNoClick), currentClickButton(ClickButton::eNone), lock(false)
+	{}
+	void OnClick(const glm::vec2& ClickLocation, const ClickButton PressedButton);
+	void OnRelease(const glm::vec2& ReleaseLocation, const ClickButton PressedButton);
+	void Update();
+	void FrameEnd();
+	void ResetClick();
+	ClickType GetCurrentClickTime() const;
+	bool GetBeingheld() const;
+	glm::vec2 initialClickLocation;
+	glm::vec2 finalClickLocation;
+	float currentTime;
+	ClickButton currentClickButton;
+private:
+	ClickType currentClickType;
+	bool lock;
+};
+
 class PlayerController
 {
 public:
@@ -25,5 +62,6 @@ public:
 protected:
 	std::vector<ClickIndicator> m_clickIndicators;
 	std::vector<Ship*> m_selectedShips;
+	ClickManager clickManager;
 };
 

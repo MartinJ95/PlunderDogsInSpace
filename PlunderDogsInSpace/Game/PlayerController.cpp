@@ -135,3 +135,79 @@ void PlayerController::EndOfFrame()
         m_clickIndicators[i].m_transform.EndFrame();
     }
 }
+
+void ClickManager::OnClick(const glm::vec2& ClickLocation, const ClickButton PressedButton)
+{
+    if (currentClickButton != ClickButton::eNone && PressedButton != currentClickButton)
+    {
+        if (!lock)
+            ResetClick();
+        return;
+    }
+
+    if (lock)
+        return;
+
+    if (currentClickButton == ClickButton::eNone)
+    {
+        currentClickButton = PressedButton;
+        initialClickLocation = ClickLocation;
+        currentClickType = ClickType::eSingleClick;
+        lock = true;
+        currentTime = 0.f;
+        return;
+    }
+    if (currentClickType == ClickType::eSingleClick)
+    {
+        lock = true;
+        currentClickType = ClickType::eDoubleClick;
+        currentTime = 0.f;
+    }
+    finalClickLocation = ClickLocation;
+}
+
+void ClickManager::OnRelease(const glm::vec2& ReleaseLocation, const ClickButton PressedButton)
+{
+    if (currentClickButton != PressedButton || currentClickButton == ClickButton::eNone)
+        return;
+
+    lock = false;
+    currentTime = 0.f;
+}
+
+void ClickManager::Update()
+{
+    if (currentClickType == ClickType::eNoClick || currentClickButton == ClickButton::eNone)
+        return;
+
+    currentTime += ServiceLocator::GetTimeService().deltaTime;
+}
+
+void ClickManager::FrameEnd()
+{
+    if (currentClickType == ClickType::eNoClick || currentClickButton == ClickButton::eNone)
+        return;
+
+    if (currentTime < ClickResetTime)
+        return;
+
+    if (!lock)
+        return ResetClick();
+}
+
+void ClickManager::ResetClick()
+{
+    initialClickLocation = glm::vec2(0.f);
+    finalClickLocation = glm::vec2(0.f);
+    currentTime = 0.f;
+    currentClickType = ClickType::eNoClick;
+    currentClickButton = ClickButton::eNone;
+}
+
+ClickType ClickManager::GetCurrentClickTime() const
+{
+    if (currentClickType == ClickType::eSingleClick && currentTime < ClickResetTime)
+        return ClickType::eNoClick;
+
+    return currentClickType;
+}
