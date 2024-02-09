@@ -24,15 +24,15 @@ void Sandbox::Update()
 void Sandbox::Render()
 {
     m_graphics.GetShader(0).SetRender3D(m_graphics.GetCamera());
-    m_graphics.Render(0, 0, true, glm::mat4(
+    /*m_graphics.Render(0, 0, true, glm::mat4(
         10.f, 0.f, 0.f, 0.f,
         0.f, 10.f, 0.f, 0.f,
         0.f, 0.f, 10.f, 0.f,
         0.f, 0.f, 0.f, 10.f
-    ));
-    m_controller.Render();
+    ));*/
     team1.Render();
     team2.Render();
+    m_controller.Render();
 	Application::Render();
 }
 
