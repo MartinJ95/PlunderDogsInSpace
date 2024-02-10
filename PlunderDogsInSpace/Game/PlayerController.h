@@ -72,5 +72,6 @@ protected:
 	std::vector<ClickIndicator> m_clickIndicators;
 	std::vector<Ship*> m_selectedShips;
 	ClickManager m_clickManager;
+	Transform m_selectionBoxTransform;
 };
 

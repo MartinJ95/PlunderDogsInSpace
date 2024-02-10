@@ -6,6 +6,25 @@ PlayerController::PlayerController() : m_clickIndicators()
 {
 }
 
+CollisionData GetPointOnPlaneCollisionData(const DefaultGraphics& Graphics, const glm::vec2& screenPos)
+{
+    Ray ray;
+    ray.origin = Graphics.GetConstCamera().GetPos();
+    //ray.line = glm::normalize(m_graphics.GetCamera().GetViewDir()) * 10.f;
+    ray.line = glm::normalize(Graphics.GetConstCamera().GetViewDirOnScreen(Graphics.GetScreenDimensions(), screenPos)) * 50.f;
+    //std::cout << "x: " << ray.line.x << "\n" << "y: " << ray.line.y << "\n" << "z: " << ray.line.z << "\n" << "\n";
+    //std::cout << "x: " << ray.origin.x << "\n" << "y: " << ray.origin.y << "\n" << "z: " << ray.origin.z << "\n" << "\n";
+
+    PlaneCollider plane;
+    plane.planeNormal = glm::vec3(0.f, 1.f, 0.f);
+
+    CollisionData data;
+
+    RayToPlane(ray, plane, data);
+
+    return data;
+}
+
 void PlayerController::Update()
 {
     glm::vec3 mouseMovement = glm::vec3(0.f);
@@ -43,24 +62,11 @@ void PlayerController::Update()
     if (!m_clickManager.GetChecked())
     {
         ClickType click = m_clickManager.GetCurrentClickType();
+        ClickButton button = m_clickManager.currentClickButton;
 
         if ((click == ClickType::eSingleClick || click == ClickType::eDoubleClick) && !m_clickManager.GetBeingheld())
         {
-            ClickButton button = m_clickManager.currentClickButton;
-
-            Ray ray;
-            ray.origin = graphics.GetCamera().GetPos();
-            //ray.line = glm::normalize(m_graphics.GetCamera().GetViewDir()) * 10.f;
-            ray.line = glm::normalize(graphics.GetCamera().GetViewDirOnScreen(graphics.GetScreenDimensions(), m_clickManager.initialClickLocation)) * 50.f;
-            //std::cout << "x: " << ray.line.x << "\n" << "y: " << ray.line.y << "\n" << "z: " << ray.line.z << "\n" << "\n";
-            //std::cout << "x: " << ray.origin.x << "\n" << "y: " << ray.origin.y << "\n" << "z: " << ray.origin.z << "\n" << "\n";
-
-            PlaneCollider plane;
-            plane.planeNormal = glm::vec3(0.f, 1.f, 0.f);
-
-            CollisionData data;
-
-            RayToPlane(ray, plane, data);
+            CollisionData data = GetPointOnPlaneCollisionData(graphics, m_clickManager.initialClickLocation);
 
             if (data.hasHit)
             {
@@ -103,6 +109,27 @@ void PlayerController::Update()
                 }
             }
             //std::cout << data;
+        }
+        else if (click == ClickType::eHeldDown)
+        {
+            CollisionData first = GetPointOnPlaneCollisionData(graphics, m_clickManager.initialClickLocation);
+            CollisionData second = GetPointOnPlaneCollisionData(graphics, m_clickManager.finalClickLocation);
+
+            if (first.hasHit && second.hasHit)
+            {
+
+                glm::vec3 start = first.pointOfCollision;
+                glm::vec3 end = second.pointOfCollision;
+                glm::vec3 min = glm::vec3(std::min(start.x, end.x), std::min(start.y, end.y), std::min(start.z, end.z));
+                glm::vec3 max = glm::vec3(std::max(start.x, end.x), std::max(start.y, end.y), std::max(start.z, end.z));
+
+                m_selectionBoxTransform.SetPosition(min + (max - min) * 0.5f);
+
+                m_selectionBoxTransform.SetScale(glm::vec3((max.x - min.x) * 0.5f, 1.f, (max.z - min.z) * 0.5f));
+                m_selectionBoxTransform.EndFrame();
+                m_selectionBoxTransform.CheckModelXForm();
+                //std::cout << "hitheerr" << std::endl;
+            }
         }
     }
 
@@ -191,6 +218,14 @@ void PlayerController::Render() const
         //m_graphics.GetShader(1).m_uniforms.SetVec3(m_graphics.GetShader(1).ID, "cameraPosition", m_graphics.GetCamera().GetPos());
         graphics.Render(0, 1, true, m_clickIndicators[i].m_transform.GetModelXform());
     }
+
+    if (m_clickManager.GetBeingheld() && m_clickManager.currentTime > ClickResetTime)
+    {
+        //glm::vec3 v = m_selectionBoxTransform.GetPosition();
+        //std::cout << v.x << " " << v.y << " " << v.z << " " << std::endl;
+        graphics.GetShader(0).SetRender3D(graphics.GetCamera());
+        graphics.Render(0, 0, true, m_selectionBoxTransform.GetModelXform());
+    }
 }
 
 void PlayerController::EndOfFrame()
@@ -234,7 +269,10 @@ void ClickManager::OnClick(const glm::vec2& ClickLocation, const ClickButton Pre
     }
 
     if (lock)
+    {
+        finalClickLocation = ClickLocation;
         return;
+    }
 
     if (currentClickButton == ClickButton::eNone)
     {
@@ -268,11 +306,11 @@ void ClickManager::Update()
 
     if (currentClickType == ClickType::eNoClick || currentClickButton == ClickButton::eNone)
         return;
-    std::cout << static_cast<int>(currentClickType) << std::endl;
+    //std::cout << static_cast<int>(currentClickType) << std::endl;
 
     currentTime += ServiceLocator::GetTimeService().deltaTime;
 
-    std::cout << currentTime << std::endl;
+    //std::cout << currentTime << std::endl;
 }
 
 void ClickManager::FrameEnd()
@@ -304,7 +342,7 @@ ClickType ClickManager::GetCurrentClickType()
     if (currentClickType == ClickType::eSingleClick && currentTime < ClickResetTime)
         return ClickType::eNoClick;
 
-    if (currentClickType == ClickType::eSingleClick || currentClickType == ClickType::eDoubleClick)
+    if ((currentClickType == ClickType::eSingleClick || currentClickType == ClickType::eDoubleClick) && !lock)
     {
         checked = true;
     }
