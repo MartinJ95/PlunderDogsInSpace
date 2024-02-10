@@ -126,17 +126,17 @@ void main()
     float effectRange = 0.2f;
 
 	float dist = length(vPosition);
-	float timePercentage = currentTime / totalTime;
+	float timePercentage = min(max(currentTime / totalTime, 0.f), 1.f);
 
     float distToTime = abs(dist - timePercentage);
 
 	if(distToTime < effectRange)
 	{
-		out_color = vec4(0.f, 1.f, 0.f, 1.f*((effectRange-distToTime)*(1.f/effectRange)));
+		out_color = vec4(0.f, 1.f, 0.f, max(1.f*((effectRange-distToTime)*(1.f/effectRange)), 0.f));
 	}
 	else
 	{
-		out_color = vec4(Color, 0.f);
+		out_color = vec4(0.f, 0.f, 0.f, 0.f);
 	}
 	//out_color = vec4(vec3(0.f, 1.f, 0.f), 1.f * (length(vPosition)/5.f));
 //out_color = vec4(vPosition, 1.f);

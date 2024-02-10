@@ -123,13 +123,38 @@ void PlayerController::Update()
                 glm::vec3 min = glm::vec3(std::min(start.x, end.x), std::min(start.y, end.y), std::min(start.z, end.z));
                 glm::vec3 max = glm::vec3(std::max(start.x, end.x), std::max(start.y, end.y), std::max(start.z, end.z));
 
-                m_selectionBoxTransform.SetPosition(min + (max - min) * 0.5f);
+                m_selectionBox.min = min;
+                m_selectionBox.max = max;
+                m_selectionBox.active = true;
 
-                m_selectionBoxTransform.SetScale(glm::vec3((max.x - min.x) * 0.5f, 1.f, (max.z - min.z) * 0.5f));
-                m_selectionBoxTransform.EndFrame();
-                m_selectionBoxTransform.CheckModelXForm();
+                m_selectionBox.transform.SetPosition(min + (max - min) * 0.5f);
+
+                m_selectionBox.transform.SetScale(glm::vec3((max.x - min.x) * 0.5f, 1.f, (max.z - min.z) * 0.5f));
+                m_selectionBox.transform.EndFrame();
+                m_selectionBox.transform.CheckModelXForm();
                 //std::cout << "hitheerr" << std::endl;
             }
+        }
+        else if (m_selectionBox.active)
+        {
+            Sandbox* sandBox = (Sandbox*)ServiceLocator::GetMainService();
+            for (Ship& s : sandBox->GetTeam(1).GetShips())
+            {
+                s.Deselect();
+            }
+            m_selectedShips.clear();
+            for (Ship& s : sandBox->GetTeam(1).GetShips())
+            {
+                glm::vec2 point = glm::vec2(s.m_transform.GetPosition().x, s.m_transform.GetPosition().y);
+                AABB box;
+                box.min = glm::vec2(m_selectionBox.min.x, m_selectionBox.min.z);
+                box.max = glm::vec2(m_selectionBox.max.x, m_selectionBox.max.z);
+                if (AABBContainsPoint(point, box))
+                {
+                    s.SelectShip(m_selectedShips);
+                }
+            }
+            m_selectionBox.active = false;
         }
     }
 
@@ -224,7 +249,7 @@ void PlayerController::Render() const
         //glm::vec3 v = m_selectionBoxTransform.GetPosition();
         //std::cout << v.x << " " << v.y << " " << v.z << " " << std::endl;
         graphics.GetShader(0).SetRender3D(graphics.GetCamera());
-        graphics.Render(0, 0, true, m_selectionBoxTransform.GetModelXform());
+        graphics.Render(0, 0, true, m_selectionBox.transform.GetModelXform());
     }
 }
 

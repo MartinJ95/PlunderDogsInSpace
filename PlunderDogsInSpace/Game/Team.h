@@ -165,6 +165,24 @@ struct Ship
 			markedForDeletion = true;
 		}
 	}
+	bool SelectShip(std::vector<Ship*>& SelectedShips)
+	{
+		bool isInVector = false;
+		for (Ship* s : SelectedShips)
+		{
+			if (s == this)
+			{
+				isInVector = true;
+				break;
+			}
+		}
+		if (!isInVector)
+		{
+			SelectedShips.emplace_back(this);
+			selected = true;
+			return true;
+		}
+	}
 	bool SelectShip(const glm::vec3& ClickPos, std::vector<Ship*>& SelectedShips)
 	{
 		SphereCollider s(1.f);
@@ -181,7 +199,8 @@ struct Ship
 		
 		if (data.hasHit)
 		{
-			bool isInVector = false;
+			return SelectShip(SelectedShips);
+			/*bool isInVector = false;
 			for (Ship* s : SelectedShips)
 			{
 				if (s == this)
@@ -195,7 +214,7 @@ struct Ship
 				SelectedShips.emplace_back(this);
 				selected = true;
 				return true;
-			}
+			}*/
 		}
 		return false;
 	}

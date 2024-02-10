@@ -103,3 +103,12 @@ static void SphereToSphere(const SphereCollider& obj, const SphereCollider& othe
 		Data.pointOfCollision = Data.otherT->GetPosition() + glm::normalize(-ObjToOther) * (Data.penetrationDepth + other.radius);
 	}
 }
+
+static bool AABBContainsPoint(const glm::vec2& point, const AABB& box)
+{
+	if (point.x > box.min.x && point.x < box.max.x && point.y > box.min.y && point.y < box.max.y)
+	{
+		return true;
+	}
+	return false;
+}

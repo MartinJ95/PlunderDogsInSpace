@@ -61,6 +61,16 @@ private:
 	bool checked;
 };
 
+struct SelectionBox
+{
+	SelectionBox() : transform(), min(0.f), max(0.f), active(false)
+	{}
+	Transform transform;
+	glm::vec3 min;
+	glm::vec3 max;
+	bool active;
+};
+
 class PlayerController
 {
 public:
@@ -72,6 +82,6 @@ protected:
 	std::vector<ClickIndicator> m_clickIndicators;
 	std::vector<Ship*> m_selectedShips;
 	ClickManager m_clickManager;
-	Transform m_selectionBoxTransform;
+	SelectionBox m_selectionBox;
 };
 
