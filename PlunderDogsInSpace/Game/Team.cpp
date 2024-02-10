@@ -26,7 +26,7 @@ void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const g
 }
 
 Ship::Ship() : ModelID(2), m_transform(), m_healthbarTransform(), m_body(), m_collider(1.f), m_tree(std::move(new BTSequenceNode)), 
-currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon(), selected(false)
+currentHealth(0.f), markedForDeletion(false), m_class(nullptr), m_shipAIData(this), m_weapon(), selected(false), timeLastAffected(ServiceLocator::GetTimeService().totalTime)
 {
 	m_healthbarTransform.SetScale(HealthbarScale);
 }
@@ -84,14 +84,16 @@ void Ship::Render()
 
 	graphics.Render(ModelID, 0, true, m_transform.GetModelXform());
 
-	graphics.GetShader(2).SetRender3D(graphics.GetCamera());
+	if ((ServiceLocator::GetTimeService().totalTime - timeLastAffected) < HealthBarHideTime)
+	{
+		graphics.GetShader(2).SetRender3D(graphics.GetCamera());
 
-	graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "health", currentHealth);
+		graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "health", currentHealth);
 
-	graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "totalHealth", m_class->health);
+		graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "totalHealth", m_class->health);
 
-	graphics.Render(0, 2, true, m_healthbarTransform.GetModelXform());
-
+		graphics.Render(0, 2, true, m_healthbarTransform.GetModelXform());
+	}
 	if (selected)
 	{
 		graphics.GetShader(3).SetRender3D(graphics.GetCamera());

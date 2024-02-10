@@ -85,6 +85,8 @@ constexpr ShipClass Cruiser{ 150.f, 1.f, DefaultCannon };
 
 constexpr glm::vec3 HealthbarScale = glm::vec3(1.f, 1.f, 0.2f);
 
+constexpr float HealthBarHideTime{ 2.5f };
+
 struct Ship
 {
 	Ship();
@@ -159,6 +161,7 @@ struct Ship
 	}
 	void TakeDamage(const float DamageRecieved)
 	{
+		timeLastAffected = ServiceLocator::GetTimeService().totalTime;
 		currentHealth -= DamageRecieved;
 		if (currentHealth <= 0)
 		{
@@ -234,6 +237,7 @@ protected:
 	ShipAIData m_shipAIData;
 	const ShipClass* m_class;
 	EquippedWeapon m_weapon;
+	float timeLastAffected;
 	bool markedForDeletion;
 	bool selected;
 };
