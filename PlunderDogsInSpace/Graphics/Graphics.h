@@ -182,6 +182,7 @@ public:
 	virtual void Display() = 0;
 	virtual void PollEvents() = 0;
 	Camera& GetCamera() { return m_cam; }
+	const Camera& GetConstCamera() const { return m_cam; }
 protected:
 	float m_screenWidth, m_screenHeight;
 	Camera m_cam;
