@@ -102,15 +102,19 @@ void PlayerController::Update()
                 }
                 else
                 {
-                    for (Ship* s : m_selectedShips)
+                    for (int i = 0; i < m_selectedShips.size(); i++)
+                    {
+                        m_selectedShips[i]->MoveShip(clickPos + (m_selectedShips[i]->m_transform.GetPosition() - m_selectedShips[0]->m_transform.GetPosition()));
+                    }
+                    /*for (Ship* s : m_selectedShips)
                     {
                         s->MoveShip(clickPos);
-                    }
+                    }*/
                 }
             }
             //std::cout << data;
         }
-        else if (click == ClickType::eHeldDown)
+        else if (click == ClickType::eHeldDown && button == ClickButton::eLeft)
         {
             CollisionData first = GetPointOnPlaneCollisionData(graphics, m_clickManager.initialClickLocation);
             CollisionData second = GetPointOnPlaneCollisionData(graphics, m_clickManager.finalClickLocation);
