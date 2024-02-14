@@ -19,7 +19,7 @@ void Sandbox::Update()
     m_controller.Update();
     team1.Update();
     team2.Update();
-    testPlanet.m_transform.SetRotation(testPlanet.m_transform.GetRotation() * glm::quat(glm::vec3(0.f, glm::radians((float)((int)(testPlanet.orbitSpeed * ServiceLocator::GetTimeService().deltaTime) % 360)), 0.f)));
+    testPlanet.m_transform.SetRotation(testPlanet.m_transform.GetRotation() * glm::quat(glm::vec3(0.f, glm::radians(testPlanet.orbitSpeed * ServiceLocator::GetTimeService().deltaTime), 0.f)));
     testPlanet.m_transform.CheckModelXForm();
     Application::Update();
 }
@@ -27,7 +27,7 @@ void Sandbox::Update()
 void Sandbox::Render()
 {
     m_graphics.GetShader(0).SetRender3D(m_graphics.GetCamera());
-    m_graphics.Render(0, 0, true, testPlanet.m_transform.GetModelXform());
+    m_graphics.Render(3, 0, true, testPlanet.m_transform.GetModelXform());
     /*m_graphics.Render(0, 0, true, glm::mat4(
         10.f, 0.f, 0.f, 0.f,
         0.f, 10.f, 0.f, 0.f,
