@@ -176,8 +176,11 @@ void Team::Render()
 	{
 		p.transform.CheckModelXForm();
 		DefaultGraphics& graphics = ServiceLocator::GetGraphics();
-		graphics.Render(p.projectile->modelID, 0, true, p.transform.GetModelXform());
+		//graphics.Render(p.projectile->modelID, 0, true, p.transform.GetModelXform());
+		p.emitter.Render();
 	}
+	//std::cout << ParticleNum * sizeof(Particle) << std::endl;
+	std::cout << m_projectiles.size() * 900 * sizeof(Particle) << std::endl;
 }
 
 void Team::EndOfFrame()
@@ -245,6 +248,7 @@ void ShotProjectile::Update()
 		markedForDeletion = true;
 	}
 	transform.Move(direction * ServiceLocator::GetTimeService().deltaTime);
+	emitter.Update(transform, glm::vec3(1, 0, 0));
 }
 
 void ShotProjectile::EndOfFrame()
