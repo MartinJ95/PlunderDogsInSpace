@@ -1,5 +1,7 @@
 #include "Team.h"
+#include "Sandbox.h"
 #include <stack>
+
 
 void EquippedWeapon::Update()
 {
@@ -18,8 +20,12 @@ void EquippedWeapon::Shoot(Team* OwningTeam, const glm::vec3& Direction, const g
 {
 	if (!hasShot)
 	{
+		Sandbox* s = (Sandbox*)ServiceLocator::GetMainService();
 		hasShot = true;
-		OwningTeam->GetProjectiles().emplace_back(ShotProjectile(weapon->projectile, Direction));
+		Emitter e(900, false);
+		s->ClaimEmitter(e);
+		//ShotProjectile test{ weapon->projectile, Direction, std::move(e) };
+		OwningTeam->GetProjectiles().emplace_back(std::move(ShotProjectile(weapon->projectile, Direction, std::move(e))));
 		OwningTeam->GetProjectiles().back().transform.SetPosition(Position);
 		OwningTeam->GetProjectiles().back().transform.EndFrame();
 	}

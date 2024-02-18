@@ -13,7 +13,7 @@ class ObjectPool
 public:
 	ObjectPool(const unsigned int PoolSize, const T&& initial) : m_objects(), size(PoolSize)
 	{
-		for (int i = 0; i < PoolSize i++)
+		for (int i = 0; i < PoolSize; i++)
 		{
 			m_objects.emplace(T(initial));
 		}
@@ -22,11 +22,12 @@ public:
 	{
 		m_objects.emplace(std::move(object));
 	}
-	T&& GetNextObject()
+	void GetNextObject(T& OutEmitter)
 	{
-		T obj = std::move(m_objects.front);
+		//T obj = std::move(m_objects.front());
+		OutEmitter = std::move(m_objects.front());
 		m_objects.pop();
-		return std::move(obj);
+		//return std::move(obj);
 	}
 private:
 	std::queue<T> m_objects;
@@ -56,13 +57,21 @@ struct Particle
 class Emitter
 {
 public:
-	Emitter(const unsigned int MaxParticles) : maxParticles(MaxParticles), m_particles(), currentParticles(0), emitTime(0.005f), emitTimer(0.f)
+	Emitter(const unsigned int MaxParticles, bool Initialise = true) : maxParticles(MaxParticles), m_particles(), currentParticles(0), emitTime(0.005f), emitTimer(0.f)
 	{
-		m_particles.resize(MaxParticles);
+		if (Initialise)
+		{
+			m_particles.resize(MaxParticles);
+		}
 		//m_particles.reserve(maxParticles);
 	}
 	Emitter(const Emitter& other) : maxParticles(other.maxParticles), m_particles(other.m_particles), currentParticles(other.currentParticles), emitTime(other.emitTime), emitTimer(other.emitTimer)
 	{}
+	Emitter(Emitter&& other) : maxParticles(other.maxParticles), m_particles(std::move(other.m_particles)), currentParticles(other.currentParticles), emitTime(other.emitTime), emitTimer(other.emitTimer)
+	{
+		other.currentParticles = 0;
+		other.m_particles.clear();
+	}
 	void operator=(const Emitter& other)
 	{
 		m_particles = other.m_particles;
@@ -70,9 +79,18 @@ public:
 		emitTime = other.emitTime;
 		emitTimer = other.emitTimer;
 	}
+	void operator=(Emitter&& other)
+	{
+		m_particles = std::move(other.m_particles);
+		currentParticles = other.currentParticles;
+		emitTime = other.emitTime;
+		emitTimer = other.emitTimer;
+		other.currentParticles = 0;
+		other.m_particles.clear();
+	}
 	void Update(const Transform& AttachedTransform, const glm::vec3& ParticleColor)
 	{
-		emitTimer += ServiceLocator::GetTimeService().deltaTime;
+		Update();
 
 		while (emitTimer > emitTime)
 		{
@@ -83,6 +101,10 @@ public:
 			properties.color = glm::vec3(1, 0, 0);
 			Emit(properties);
 		}
+	}
+	void Update()
+	{
+		emitTimer += ServiceLocator::GetTimeService().deltaTime;
 
 		for (int i = 0; i < currentParticles; i++)
 		{
@@ -122,6 +144,10 @@ public:
 		m_particles[currentParticles].properties = properties;
 		ParticleNum++;
 	}
+	const unsigned int GetCurrentParticles() const
+	{
+		return currentParticles;
+	}
 	const unsigned int maxParticles;
 private:
 	std::vector<Particle> m_particles;
@@ -139,17 +165,49 @@ struct Projectile
 
 struct ShotProjectile
 {
-	ShotProjectile(const Projectile& Projectile, const glm::vec3& Direction, float Lifetime = 50.f) : projectile(&Projectile), direction(Direction), currentLifetime(0.f), lifeTime(Lifetime), transform(), collider(0.2f), emitter(900), markedForDeletion(false)
+	ShotProjectile(const Projectile& Projectile, const glm::vec3& Direction, Emitter&& Emitter, float Lifetime = 50.f) : projectile(&Projectile), direction(Direction), currentLifetime(0.f), lifeTime(Lifetime), transform(), collider(0.2f), emitter(std::move(Emitter)), markedForDeletion(false)
 	{
 		transform.SetScale(glm::vec3(0.2f));
+	}
+	ShotProjectile(const ShotProjectile& other) : projectile(other.projectile), direction(other.direction), currentLifetime(other.currentLifetime), lifeTime(other.lifeTime), transform(other.transform),
+		collider(other.collider), emitter(other.emitter), markedForDeletion(other.markedForDeletion)
+	{
+	}
+	ShotProjectile(ShotProjectile&& other) : projectile(other.projectile), direction(other.direction), currentLifetime(other.currentLifetime), lifeTime(other.lifeTime),  emitter(std::move(other.emitter)), transform(other.transform),
+		collider(other.collider), markedForDeletion(other.markedForDeletion)
+	{
+	}
+	~ShotProjectile()
+	{}
+	void operator=(const ShotProjectile& other)
+	{
+		projectile = other.projectile;
+		direction = other.direction;
+		currentLifetime = other.currentLifetime;
+		lifeTime = other.lifeTime;
+		transform = other.transform;
+		collider = other.collider;
+		emitter = other.emitter;
+		markedForDeletion = other.markedForDeletion;
+	}
+	void operator=(ShotProjectile&& other)
+	{
+		projectile = other.projectile;
+		direction = other.direction;
+		currentLifetime = other.currentLifetime;
+		lifeTime = other.lifeTime;
+		transform = other.transform;
+		collider = other.collider;
+		emitter = std::move(other.emitter);
+		markedForDeletion = other.markedForDeletion;
 	}
 	const Projectile* projectile;
 	glm::vec3 direction;
 	float currentLifetime;
 	float lifeTime;
+	Emitter emitter;
 	Transform transform;
 	SphereCollider collider;
-	Emitter emitter;
 	bool markedForDeletion;
 	void Update();
 	void EndOfFrame();

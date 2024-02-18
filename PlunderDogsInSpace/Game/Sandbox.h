@@ -28,10 +28,22 @@ public:
 		}
 		return team1;
 	}
+	void ReturnEmitter(Emitter&& Emitter)
+	{
+		m_cleaningEmitters.emplace_back(std::move(Emitter));
+	}
+	void ClaimEmitter(Emitter& OutEmitter)
+	{
+		m_emitters.GetNextObject(OutEmitter);
+		//Emitter e = m_emitters.GetNextObject();
+		//return std::move(e);
+	}
 protected:
 	PlayerController m_controller;
 	Team team1;
 	Team team2;
 	Planet testPlanet;
+	ObjectPool<Emitter> m_emitters;
+	std::vector<Emitter> m_cleaningEmitters;
 };
 

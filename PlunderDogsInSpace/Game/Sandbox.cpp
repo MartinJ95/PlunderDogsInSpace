@@ -2,7 +2,7 @@
 #include "PlayerController.h"
 #include "../Physics/Collisions.h"
 
-Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team2(glm::vec3(0.f, 0.f, -25.f), true)
+Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team2(glm::vec3(0.f, 0.f, -25.f), true), testPlanet(), m_emitters(200, std::move(Emitter(900)))
 {
 }
 
@@ -21,6 +21,15 @@ void Sandbox::Update()
     team2.Update();
     testPlanet.m_transform.SetRotation(testPlanet.m_transform.GetRotation() * glm::quat(glm::vec3(0.f, glm::radians(testPlanet.orbitSpeed * ServiceLocator::GetTimeService().deltaTime), 0.f)));
     testPlanet.m_transform.CheckModelXForm();
+    for (int i = m_cleaningEmitters.size(); i < 0; i--)
+    {
+        m_cleaningEmitters[i].Update();
+        if (m_cleaningEmitters[i].GetCurrentParticles() == 0)
+        {
+            m_emitters.ReleaseObject(std::move(m_cleaningEmitters[i]));
+            m_cleaningEmitters.erase(m_cleaningEmitters.begin() + i);
+        }
+    }
     Application::Update();
 }
 
@@ -37,6 +46,10 @@ void Sandbox::Render()
     team1.Render();
     team2.Render();
     m_controller.Render();
+    for (Emitter& e : m_cleaningEmitters)
+    {
+        e.Render();
+    }
 	Application::Render();
 }
 
