@@ -35,21 +35,46 @@ void Sandbox::Update()
 
 void Sandbox::Render()
 {
-    m_graphics.GetShader(0).SetRender3D(m_graphics.GetCamera());
-    m_graphics.Render(3, 0, true, testPlanet.m_transform.GetModelXform());
+    for (int i = 0; i < 10; i++)
+    {
+        if (!m_graphics.ShaderExist(i))
+            continue;
+
+        m_graphics.GetShader(i).SetRender3D(m_graphics.GetCamera());
+
+        switch (i)
+        {
+        case 0:
+            if (!m_graphics.GetShader(0).m_uniforms.UniformLocationExists(m_graphics.GetShader(0).GetID(), "model_xform"))
+                break;
+            m_graphics.Render(3, 0, true, testPlanet.m_transform.GetModelXform());
+            for (Emitter& e : m_cleaningEmitters)
+            {
+                e.Render();
+            }
+            std::cout << "particle num" << "\n" << "---------------" << "\n" << Emitter::ParticleNum << "\n";
+            break;
+        default:
+            break;
+        }
+        team1.Render(i);
+        team2.Render(i);
+        m_controller.Render(i);
+
+    }
+
+    //m_graphics.GetShader(0).SetRender3D(m_graphics.GetCamera());
+    
     /*m_graphics.Render(0, 0, true, glm::mat4(
         10.f, 0.f, 0.f, 0.f,
         0.f, 10.f, 0.f, 0.f,
         0.f, 0.f, 10.f, 0.f,
         0.f, 0.f, 0.f, 10.f
     ));*/
-    team1.Render();
-    team2.Render();
-    m_controller.Render();
-    for (Emitter& e : m_cleaningEmitters)
-    {
-        e.Render();
-    }
+    
+    
+    //DefaultGraphics& graphics = ServiceLocator::GetGraphics();
+    //graphics.GetShader(0).SetRender3D(graphics.GetCamera());
 	Application::Render();
 }
 

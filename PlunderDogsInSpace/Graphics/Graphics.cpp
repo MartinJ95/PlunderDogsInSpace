@@ -105,10 +105,15 @@ void GLGraphics::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+bool GLGraphics::DoesModelExist(const int ModelID) const
+{
+	return m_models.find(ModelID) != m_models.end();
+}
+
 void GLGraphics::Render(const unsigned int ModelID, const unsigned int ShaderID, const bool Is3D, const glm::mat4& ModelXForm)
 {
-	if (m_models.find(ModelID) == m_models.end())
-		return;
+	//if (m_models.find(ModelID) == m_models.end())
+		//return;
 
 	if (Is3D)
 		m_shaders.find(ShaderID)->second.m_uniforms.SetMat4(m_shaders.find(ShaderID)->second.GetID(), "model_xform", ModelXForm);
@@ -223,6 +228,11 @@ void GLUniformSetter::SetFloat(const int ID, const std::string& name, float valu
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
+bool GLUniformSetter::UniformLocationExists(const int ID, const std::string& name) const
+{
+	return glGetUniformLocation(ID, name.c_str()) != -1;
+}
+
 void GLUniformSetter::SetBool(const int ID, const std::string& name, bool value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
@@ -235,15 +245,15 @@ void GLUniformSetter::SetInt(const int ID, const std::string& name, int value) c
 
 void GLUniformSetter::SetVec3(const int ID, const std::string& name, const glm::vec3& value) const
 {
-	if (glGetUniformLocation(ID, name.c_str()) == -1)
-		return;
+	//if (glGetUniformLocation(ID, name.c_str()) == -1)
+		//return;
 	glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
 }
 
 void GLUniformSetter::SetMat4(const int ID, const std::string& name, const glm::mat4& value) const
 {
-	if (glGetUniformLocation(ID, name.c_str()) == -1)
-		return;
+	/*if (glGetUniformLocation(ID, name.c_str()) == -1)
+		return;*/
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, false, glm::value_ptr(value));
 }
 

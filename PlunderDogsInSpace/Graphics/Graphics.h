@@ -132,6 +132,7 @@ protected:
 struct GLUniformSetter
 {
 	void SetFloat(const int ID, const std::string& name, float value) const;
+	bool UniformLocationExists(const int ID, const std::string& name) const;
 	inline void SetBool(const int ID, const std::string& name, bool value) const;
 	inline void SetInt(const int ID, const std::string& name, int value) const;
 	inline void SetVec3(const int ID, const std::string& name, const glm::vec3& value) const;
@@ -228,10 +229,12 @@ public:
 	virtual glm::vec2 GetMouseLocation() const override final;
 	virtual bool ShouldWindowClose() override final;
 	virtual void Clear() override final;
+	bool DoesModelExist(const int ModelID) const;
 	virtual void Render(const unsigned int ModelID, const unsigned int ShaderID, const bool Is3D = false, const glm::mat4& ModelXForm = glm::mat4()) override final;
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
 	GLShader& GetShader(const int ID) { return m_shaders.at(ID); }
+	inline bool ShaderExist(const int ID) { return m_shaders.find(ID) != m_shaders.end(); }
 	GLFWwindow* GetWindow() const { return m_window; }
 protected:
 	GLFWwindow* m_window;

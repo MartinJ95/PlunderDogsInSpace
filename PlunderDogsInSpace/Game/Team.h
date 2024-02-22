@@ -36,8 +36,6 @@ private:
 
 constexpr float velocityChangeModifier = 0.0005f;
 
-static float ParticleNum = 0;
-
 struct ParticleProperties
 {
 	float lifeTime = static_cast<float>((rand() % 2) + 1);
@@ -66,11 +64,17 @@ public:
 		//m_particles.reserve(maxParticles);
 	}
 	Emitter(const Emitter& other) : maxParticles(other.maxParticles), m_particles(other.m_particles), currentParticles(other.currentParticles), emitTime(other.emitTime), emitTimer(other.emitTimer)
-	{}
+	{
+		ParticleNum += currentParticles;
+	}
 	Emitter(Emitter&& other) : maxParticles(other.maxParticles), m_particles(std::move(other.m_particles)), currentParticles(other.currentParticles), emitTime(other.emitTime), emitTimer(other.emitTimer)
 	{
 		other.currentParticles = 0;
 		other.m_particles.clear();
+	}
+	~Emitter()
+	{
+		ParticleNum -= currentParticles;
 	}
 	void operator=(const Emitter& other)
 	{
@@ -127,7 +131,10 @@ public:
 	{
 		DefaultGraphics& graphics = ServiceLocator::GetGraphics();
 
-		graphics.GetShader(0).SetRender3D(graphics.GetCamera());
+		//graphics.GetShader(0).SetRender3D(graphics.GetCamera());
+
+		if (!graphics.DoesModelExist(3))
+			return;
 
 		for (int i = 0; i < currentParticles; i++)
 		{
@@ -149,6 +156,7 @@ public:
 		return currentParticles;
 	}
 	const unsigned int maxParticles;
+	static int ParticleNum;
 private:
 	std::vector<Particle> m_particles;
 	unsigned int currentParticles;
@@ -318,7 +326,7 @@ struct Ship
 	float currentHealth;
 	void Init(Team* OwningTeam);
 	void Update();
-	void Render();
+	void Render(const unsigned int RenderPass = 0);
 	void EndOfFrame();
 	ShipAIData& GetShipAIData() 
 	{
@@ -432,7 +440,7 @@ public:
 public:
 	void Init(Team* Other);
 	void Update();
-	void Render();
+	void Render(const unsigned int RenderPass = 0);
 	void EndOfFrame();
 	Team* GetOtherTeam()
 	{

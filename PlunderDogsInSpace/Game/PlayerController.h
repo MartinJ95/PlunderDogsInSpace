@@ -76,7 +76,7 @@ class PlayerController
 public:
 	PlayerController();
 	void Update();
-	void Render() const;
+	void Render(const unsigned int RenderPass = 0) const;
 	void EndOfFrame();
 protected:
 	std::vector<ClickIndicator> m_clickIndicators;

@@ -232,29 +232,42 @@ void PlayerController::Update()
     }
 }
 
-void PlayerController::Render() const
+void PlayerController::Render(const unsigned int RenderPass) const
 {
     DefaultGraphics& graphics = ServiceLocator::GetGraphics();
     TimeManager& timeService = ServiceLocator::GetTimeService();
-    graphics.GetShader(1).SetRender3D(graphics.GetCamera());
 
-    for (int i = 0; i < m_clickIndicators.size(); i++)
+    switch (RenderPass)
     {
-        if (m_clickIndicators[i].m_markedForDeletion)
-            continue;
-        graphics.GetShader(1).m_uniforms.SetFloat(graphics.GetShader(1).ID, "currentTime", m_clickIndicators[i].m_currentTime);
-        graphics.GetShader(1).m_uniforms.SetFloat(graphics.GetShader(1).ID, "totalTime", m_clickIndicators[i].m_lifetime);
-        //m_graphics.GetShader(1).m_uniforms.SetVec3(m_graphics.GetShader(1).ID, "cameraPosition", m_graphics.GetCamera().GetPos());
-        graphics.Render(0, 1, true, m_clickIndicators[i].m_transform.GetModelXform());
+    case 0:
+        if (m_clickManager.GetBeingheld() && m_clickManager.currentTime > ClickResetTime)
+        {
+            //glm::vec3 v = m_selectionBoxTransform.GetPosition();
+            //std::cout << v.x << " " << v.y << " " << v.z << " " << std::endl;
+            graphics.GetShader(0).SetRender3D(graphics.GetCamera());
+            graphics.Render(0, 0, true, m_selectionBox.transform.GetModelXform());
+        }
+        break;
+    case 1:
+        for (int i = 0; i < m_clickIndicators.size(); i++)
+        {
+            if (m_clickIndicators[i].m_markedForDeletion)
+                continue;
+            graphics.GetShader(1).m_uniforms.SetFloat(graphics.GetShader(1).ID, "currentTime", m_clickIndicators[i].m_currentTime);
+            graphics.GetShader(1).m_uniforms.SetFloat(graphics.GetShader(1).ID, "totalTime", m_clickIndicators[i].m_lifetime);
+            //m_graphics.GetShader(1).m_uniforms.SetVec3(m_graphics.GetShader(1).ID, "cameraPosition", m_graphics.GetCamera().GetPos());
+            graphics.Render(0, 1, true, m_clickIndicators[i].m_transform.GetModelXform());
+        }
+        break;
+    default:
+        break;
     }
 
-    if (m_clickManager.GetBeingheld() && m_clickManager.currentTime > ClickResetTime)
-    {
-        //glm::vec3 v = m_selectionBoxTransform.GetPosition();
-        //std::cout << v.x << " " << v.y << " " << v.z << " " << std::endl;
-        graphics.GetShader(0).SetRender3D(graphics.GetCamera());
-        graphics.Render(0, 0, true, m_selectionBox.transform.GetModelXform());
-    }
+    //graphics.GetShader(1).SetRender3D(graphics.GetCamera());
+
+    
+
+    
 }
 
 void PlayerController::EndOfFrame()

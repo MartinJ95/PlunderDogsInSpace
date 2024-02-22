@@ -2,6 +2,7 @@
 #include "Sandbox.h"
 #include <stack>
 
+int Emitter::ParticleNum{0};
 
 void EquippedWeapon::Update()
 {
@@ -82,37 +83,48 @@ void Ship::Update()
 	m_tree.Evaluate(&m_shipAIData);
 }
 
-void Ship::Render()
+void Ship::Render(const unsigned int RenderPass)
 {
 	DefaultGraphics& graphics = ServiceLocator::GetGraphics();
 
-	graphics.GetShader(0).SetRender3D(graphics.GetCamera());
+	//graphics.GetShader(0).SetRender3D(graphics.GetCamera());
 
-	graphics.Render(ModelID, 0, true, m_transform.GetModelXform());
-
-	if ((ServiceLocator::GetTimeService().totalTime - timeLastAffected) < HealthBarHideTime)
+	switch (RenderPass)
 	{
-		graphics.GetShader(2).SetRender3D(graphics.GetCamera());
+	case 0:
+		graphics.Render(ModelID, 0, true, m_transform.GetModelXform());
+		break;
+	case 1:
+		break;
+	case 2:
+		if ((ServiceLocator::GetTimeService().totalTime - timeLastAffected) < HealthBarHideTime)
+		{
+			graphics.GetShader(2).SetRender3D(graphics.GetCamera());
 
-		graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "health", currentHealth);
+			graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "health", currentHealth);
 
-		graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "totalHealth", m_class->health);
+			graphics.GetShader(2).m_uniforms.SetFloat(graphics.GetShader(2).GetID(), "totalHealth", m_class->health);
 
-		graphics.Render(0, 2, true, m_healthbarTransform.GetModelXform());
-	}
-	if (selected)
-	{
-		graphics.GetShader(3).SetRender3D(graphics.GetCamera());
-		glm::vec3 v(0, 0, 1);
+			graphics.Render(0, 2, true, m_healthbarTransform.GetModelXform());
+		}
+		break;
+	case 3:
+		if (selected)
+		{
+			graphics.GetShader(3).SetRender3D(graphics.GetCamera());
+			glm::vec3 v(0, 0, 1);
 
-		v = v * glm::quat(glm::vec3(0, glm::radians(ServiceLocator::GetTimeService().totalTime*15.f), 0));
+			v = v * glm::quat(glm::vec3(0, glm::radians(ServiceLocator::GetTimeService().totalTime * 15.f), 0));
 
-		graphics.GetShader(3).m_uniforms.SetVec3(graphics.GetShader(3).GetID(), "rotatedTimeVec", v);
+			graphics.GetShader(3).m_uniforms.SetVec3(graphics.GetShader(3).GetID(), "rotatedTimeVec", v);
 
-		graphics.Render(1, 3, true, m_transform.GetModelXform());
-	}
-	
-	graphics.GetShader(0).SetRender3D(graphics.GetCamera());
+			graphics.Render(1, 3, true, m_transform.GetModelXform());
+		}
+		break;
+	default:
+		break;
+	}	
+	//graphics.GetShader(0).SetRender3D(graphics.GetCamera());
 }
 
 void Ship::EndOfFrame()
@@ -172,21 +184,32 @@ void Team::Update()
 	}
 }
 
-void Team::Render()
+void Team::Render(const unsigned int RenderPass)
 {
 	for (Ship& s : m_ships)
 	{
-		s.Render();
+		s.Render(RenderPass);
 	}
-	for (ShotProjectile& p : m_projectiles)
+
+	switch (RenderPass)
 	{
-		p.transform.CheckModelXForm();
-		DefaultGraphics& graphics = ServiceLocator::GetGraphics();
-		//graphics.Render(p.projectile->modelID, 0, true, p.transform.GetModelXform());
-		p.emitter.Render();
+	case 0:
+		for (ShotProjectile& p : m_projectiles)
+		{
+			p.transform.CheckModelXForm();
+			//DefaultGraphics& graphics = ServiceLocator::GetGraphics();
+			//graphics.Render(p.projectile->modelID, 0, true, p.transform.GetModelXform());
+			p.emitter.Render();
+		}
+		break;
+	default:
+		break;
 	}
+	//DefaultGraphics& graphics = ServiceLocator::GetGraphics();
+	//graphics.GetShader(0).SetRender3D(graphics.GetCamera());
+	
 	//std::cout << ParticleNum * sizeof(Particle) << std::endl;
-	std::cout << m_projectiles.size() * 900 * sizeof(Particle) << std::endl;
+	//std::cout << m_projectiles.size() * 900 * sizeof(Particle) << std::endl;
 }
 
 void Team::EndOfFrame()
