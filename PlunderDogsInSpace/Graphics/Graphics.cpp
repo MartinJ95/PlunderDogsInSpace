@@ -474,11 +474,11 @@ void GLModelLoading::LoadBox(std::unordered_map<unsigned int, GLModel>& Models, 
 }
 
 
-void GLModelLoading::LoadSphere(std::unordered_map<unsigned int, GLModel>& Models, const unsigned int ID, const float Size)
+void GLModelLoading::LoadSphere(std::unordered_map<unsigned int, GLModel>& Models, const unsigned int ID, const float Size, const int GraphicsLevel)
 {
-	constexpr int details = 50;
+	constexpr int details[]{ 50, 40, 30, 20, 10 };
 
-	constexpr float thetaChange = 360.f / (float)details;
+	constexpr float thetaChange[]{ 360.f / (float)details[0], 360.f / (float)details[1], 360.f / (float)details[2], 360.f / (float)details[3], 360.f / (float)details[4] };
 
 	std::vector<Vertex> vertices;
 	vertices.reserve(2502);
@@ -490,15 +490,17 @@ void GLModelLoading::LoadSphere(std::unordered_map<unsigned int, GLModel>& Model
 
 	vertices[1] = Vertex(glm::vec3(0.f, -1.f, 0.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, -1.f, 0.f), glm::vec2(0.f, 0.f));
 
-	for (int i = 0; i < details; i++)
+	for (int i = 0; i < details[GraphicsLevel]; i++)
 	{
 		glm::vec3 initial = glm::vec3(0.f, 1.f, 0.f);
 		
-		float thetaChange1 = (thetaChange * (i + 1))*0.5;
+		//pitch
+		float thetaChange1 = (thetaChange[GraphicsLevel] * (i + 1))*0.5;
 
-		for (int j = 0; j < details; j++)
+		for (int j = 0; j < details[GraphicsLevel]; j++)
 		{
-			float thetaChange2 = thetaChange * (j + 1);
+			//roll
+			float thetaChange2 = thetaChange[GraphicsLevel] * (j + 1);
 			//glm::quat q = glm::quat(glm::vec3(glm::radians(thetaChange1), glm::radians(thetaChange2), 0.f));
 			//glm::quat q = glm::quat(glm::vec3(glm::radians(thetaChange1), 0.f, 0.f));
 
@@ -507,39 +509,49 @@ void GLModelLoading::LoadSphere(std::unordered_map<unsigned int, GLModel>& Model
 			rotated = rotated * glm::quat(glm::vec3(0.f, glm::radians(thetaChange2), 0.f));
 			rotated = glm::normalize(rotated);
 
-			vertices[2 + (details * i) + j] = Vertex(
+			vertices[2 + (details[GraphicsLevel] * i) + j] = Vertex(
 				//glm::normalize(initial * q),
 				rotated,
 				glm::vec3(1.f, 1.f, 1.f),
 				//glm::normalize((initial * q) - glm::vec3(0.f)),
 				glm::normalize(rotated),
-				glm::vec2(1.f - (1.f / details) * j, 1.f - (1.f / details) * i)
+				glm::vec2(1.f - (1.f / details[GraphicsLevel]) * j, 1.f - (1.f / details[GraphicsLevel]) * i)
 			);
 
-			int offset = (j + (details * i) + 2);
-			int secondOffset = j < details - 1 ? 1 : -j;
+			int offset = (j + (details[GraphicsLevel] * i) + 2);
+			int secondOffset = j < details[GraphicsLevel] - 1 ? 1 : -j;
 
-			if (i > 0 && i < details - 1)
+			if (i > 0 && i < details[GraphicsLevel] - 1)
 			{
+				//mid
 				elements.emplace_back(offset + secondOffset);
 				elements.emplace_back(offset);
-				elements.emplace_back(offset + secondOffset + details);
+				elements.emplace_back(offset + secondOffset + details[GraphicsLevel]);
 
-				elements.emplace_back(offset + secondOffset + details);
+				elements.emplace_back(offset + secondOffset + details[GraphicsLevel]);
 				elements.emplace_back(offset);
-				elements.emplace_back(offset + details);
+				elements.emplace_back(offset + details[GraphicsLevel]);
 			}
 			else if(i == 0)
 			{
-				
+				//top
 				elements.emplace_back(0);
 				elements.emplace_back(offset);
 				elements.emplace_back(offset + secondOffset);
+
+				//first mid
+				elements.emplace_back(offset + secondOffset);
+				elements.emplace_back(offset);
+				elements.emplace_back(offset + secondOffset + details[GraphicsLevel]);
+
+				elements.emplace_back(offset + secondOffset + details[GraphicsLevel]);
+				elements.emplace_back(offset);
+				elements.emplace_back(offset + details[GraphicsLevel]);
 				
 			}
-			else if (i < details - 1)
+			else if (i < details[GraphicsLevel] - 1)
 			{
-				
+				//bottom
 				elements.emplace_back(offset + secondOffset);
 				elements.emplace_back(offset);
 				elements.emplace_back(1);

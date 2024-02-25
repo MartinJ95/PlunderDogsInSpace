@@ -213,7 +213,7 @@ private:
 	void GenFace(std::vector<Vertex>& verts, std::vector<unsigned int>& elements, const glm::vec3& forward, const float forwardAmount, const glm::vec3& up, const float size, const int elementOffset = 0, const glm::vec3& positionOffset = glm::vec3(0.f), const glm::vec3& color = glm::vec3(1.f));
 	void LoadPlane(std::unordered_map<unsigned int, GLModel>& Models, const unsigned int ID, const float Size = 1.f);
 	void LoadBox(std::unordered_map<unsigned int, GLModel>& Models, const unsigned int ID, const float Size = 1.f);
-	void LoadSphere(std::unordered_map<unsigned int, GLModel>& Models, const unsigned int ID, const float Size = 1.f);
+	void LoadSphere(std::unordered_map<unsigned int, GLModel>& Models, const unsigned int ID, const float Size = 1.f, const int GraphicsLevel = 0);
 };
 
 class GLGraphics : public Graphics
