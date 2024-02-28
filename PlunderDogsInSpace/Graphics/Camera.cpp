@@ -1,5 +1,9 @@
 #include "Camera.h"
 
+Camera::Camera() : m_position(glm::vec3(0.f, 0.f, 0.f)), m_rotation(), m_fov(45.f)
+{
+}
+
 glm::vec3 Camera::GetViewDir() const
 {
 	glm::quat q(0.f, 0.f, 0.f, -1.f);
