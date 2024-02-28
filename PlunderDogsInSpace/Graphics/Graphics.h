@@ -1,10 +1,6 @@
 #pragma once
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "glm/glm/glm.hpp"
-#include "glm/glm/gtc/quaternion.hpp" 
-#include <glm/glm/gtc/type_ptr.hpp>
-#include <glm/glm/gtc/matrix_transform.hpp>
+
+#include "Camera.h"
 #include <vector>
 #include <iostream>
 #include <unordered_map>
@@ -12,59 +8,6 @@
 struct GLFWwindow;
 struct GLShader;
 
-class Camera
-{
-public:
-	Camera();
-public:
-	glm::vec3 GetPos() const { return m_position; }
-	void SetPos(const glm::vec3& NewPos) { m_position = NewPos; }
-	glm::quat GetRotation() const { return m_rotation; }
-	void SetRotation(const glm::quat& NewRot) { m_rotation = NewRot; }
-	glm::vec3 GetViewDir() const 
-	{
-		glm::quat q(0.f, 0.f, 0.f, -1.f);
-		q = m_rotation * q;
-		q = q * glm::conjugate(m_rotation);
-		return glm::vec3(q.x, q.y, q.z);
-	}
-	glm::vec3 GetViewDirOnScreen(const glm::vec2& ScreenSize, const glm::vec2& MousePosition) const
-	{
-		glm::quat q(0.f, 0.f, 0.f, -1.f);
-		glm::quat rotator = m_rotation;
-
-		float xRotation = m_fov * (MousePosition.y / ScreenSize.y);
-		xRotation -= m_fov * 0.5;
-		xRotation *= -1;
-
-		float yRotation = m_fov * (MousePosition.x / ScreenSize.x);
-		yRotation -= m_fov * 0.5;
-		yRotation *= -1;
-		yRotation *= 1 + (ScreenSize.y / ScreenSize.x);
-
-		rotator *= glm::quat(glm::vec3(glm::radians(xRotation), 0.f, 0.f));
-		rotator *= glm::quat(glm::vec3(0.f, glm::radians(yRotation), 0.f));
-
-		q = rotator * q;
-		q = q * glm::conjugate(rotator);
-		return glm::vec3(q.x, q.y, q.z);
-	}
-	glm::vec3 GetCameraUp()
-	{
-		glm::vec3 camDir = glm::normalize(GetViewDir());
-		float d = glm::dot(camDir, glm::vec3(1, 0, 0));
-		glm::vec3 side = d < -0.8f || d > 0.8f ? glm::vec3(0, 0, 1) : glm::vec3(1, 0, 0);
-		return glm::normalize(glm::cross(camDir, side));
-	}
-	float GetFOV() const
-	{
-		return m_fov;
-	}
-protected:
-	glm::vec3 m_position;
-	glm::quat m_rotation;
-	float m_fov;
-};
 
 struct Vertex
 {
