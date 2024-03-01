@@ -1,6 +1,8 @@
 #pragma once
 #include "Camera.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 struct GLUniformSetter
 {
