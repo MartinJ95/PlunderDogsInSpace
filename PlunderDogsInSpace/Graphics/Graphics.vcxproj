@@ -136,11 +136,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Models.h" />
+    <ClInclude Include="Shaders.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Dependencies\Include\src\glad.c" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="Models.cpp" />
+    <ClCompile Include="Shaders.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="clickIndicator.fs" />
