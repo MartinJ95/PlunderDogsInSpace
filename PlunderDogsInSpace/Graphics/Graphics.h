@@ -1,7 +1,6 @@
 #pragma once
 #include "Models.h"
 
-
 struct GLFWwindow;
 struct GLShader;
 
