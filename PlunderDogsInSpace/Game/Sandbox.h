@@ -2,6 +2,12 @@
 #include "../Core/Application.h"
 #include "PlayerController.h"
 #include "Team.h"
+#include "../Math/Grid.h"
+
+struct TestTile
+{
+	Transform t;
+};
 
 class Planet
 {
@@ -45,5 +51,6 @@ protected:
 	Planet testPlanet;
 	ObjectPool<Emitter> m_emitters;
 	std::vector<Emitter> m_cleaningEmitters;
+	HorizontalGridSmall<TestTile> testingGrid;
 };
 

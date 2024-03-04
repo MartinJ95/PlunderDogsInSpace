@@ -2,7 +2,7 @@
 #include "PlayerController.h"
 #include "../Physics/Collisions.h"
 
-Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team2(glm::vec3(0.f, 0.f, -25.f), true), testPlanet(), m_emitters(200, std::move(Emitter(900)))
+Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team2(glm::vec3(0.f, 0.f, -25.f), true), testPlanet(), m_emitters(200, std::move(Emitter(900))), testingGrid(-50.f, 50.f)
 {
 }
 
@@ -11,6 +11,16 @@ bool Sandbox::Init()
     team1.Init(&team2);
     team2.Init(&team1);
     testPlanet.m_transform.SetPosition(glm::vec3(0.f, -10.f, -5.f));
+    for (int i = 0; i < SmallGridTileAmount; i++)
+    {
+        for (int j = 0; j < SmallGridTileAmount; j++)
+        {
+            TestTile& t = testingGrid.GetTile(TileIndex(i, j));
+            t.t.SetPosition(testingGrid.GetPointOnTile(TileIndex(i, j)));
+            t.t.EndFrame();
+            t.t.CheckModelXForm();
+        }
+    }
 	return Application::Init();
 }
 
@@ -51,6 +61,13 @@ void Sandbox::Render()
             for (Emitter& e : m_cleaningEmitters)
             {
                 e.Render();
+            }
+            for (int i = 0; i < SmallGridTileAmount; i++)
+            {
+                for (int j = 0; j < SmallGridTileAmount; j++)
+                {
+                    m_graphics.Render(3, 0, true, testingGrid.GetTile(TileIndex(i, j)).t.GetModelXform());
+                }
             }
             std::cout << "particle num" << "\n" << "---------------" << "\n" << Emitter::ParticleNum << "\n";
             break;
