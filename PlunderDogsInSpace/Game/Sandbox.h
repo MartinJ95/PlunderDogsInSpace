@@ -44,6 +44,10 @@ public:
 		//Emitter e = m_emitters.GetNextObject();
 		//return std::move(e);
 	}
+	HorizontalGridSmall<TestTile>& GetTestingGrid()
+	{
+		return testingGrid;
+	}
 protected:
 	PlayerController m_controller;
 	Team team1;

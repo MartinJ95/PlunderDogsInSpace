@@ -133,6 +133,12 @@ void Ship::EndOfFrame()
 	m_healthbarTransform.EndFrame();
 }
 
+void Ship::MoveShip(const glm::vec3& ClickPos)
+{
+	Sandbox* s = (Sandbox*)ServiceLocator::GetMainService();
+	m_shipAIData.targetLocation = s->GetTestingGrid().GetPointOnTile(ClickPos);
+}
+
 Team::Team(glm::vec3 StartPos, bool IsAI) : m_startPosition(StartPos), m_otherTeamRef(nullptr), m_ships(), isAI(IsAI)
 {
 }

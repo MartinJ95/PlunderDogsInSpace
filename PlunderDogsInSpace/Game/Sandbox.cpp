@@ -2,7 +2,7 @@
 #include "PlayerController.h"
 #include "../Physics/Collisions.h"
 
-Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team2(glm::vec3(0.f, 0.f, -25.f), true), testPlanet(), m_emitters(200, std::move(Emitter(900))), testingGrid(-50.f, 50.f)
+Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team2(glm::vec3(0.f, 0.f, -25.f), true), testPlanet(), m_emitters(200, std::move(Emitter(900))), testingGrid(-20.f, 20.f)
 {
 }
 
@@ -17,6 +17,7 @@ bool Sandbox::Init()
         {
             TestTile& t = testingGrid.GetTile(TileIndex(i, j));
             t.t.SetPosition(testingGrid.GetPointOnTile(TileIndex(i, j)));
+            t.t.SetScale(glm::vec3(0.1f));
             t.t.EndFrame();
             t.t.CheckModelXForm();
         }
