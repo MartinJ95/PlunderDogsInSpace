@@ -34,9 +34,9 @@ public:
 	TileIndex GetTilePosition(const glm::vec3& Point) const
 	{
 		TileIndex indices;
-		indices.first = ((maxBounds.z - Point.z) / (maxBounds.z - minBounds.z)) * SmallGridTileAmount;
-		indices.second = ((maxBounds.x - Point.x) / (maxBounds.x - minBounds.x)) * SmallGridTileAmount;
-		return TileIndex();
+		indices.first = ((Point.x - minBounds.x) / (maxBounds.x - minBounds.x)) * SmallGridTileAmount;
+		indices.second = ((Point.z - minBounds.z) / (maxBounds.z - minBounds.z)) * SmallGridTileAmount;
+		return indices;
 	}
 	T& GetCurrentTile(const glm::vec3& Point)
 	{
