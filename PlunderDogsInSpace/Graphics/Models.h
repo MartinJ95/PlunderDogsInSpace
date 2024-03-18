@@ -35,6 +35,12 @@ public:
 public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> elements;
+public:
+	void BatchModel(const std::vector<glm::vec3>& batchPositions);
+public:
+	int batchAmount;
+	std::vector<Vertex> batchedVertices;
+	std::vector<unsigned int> batchedElements;
 };
 
 class GLModel

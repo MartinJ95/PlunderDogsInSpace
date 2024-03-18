@@ -74,6 +74,22 @@ Model::Model(Model&& other) :
 {
 }
 
+void Model::BatchModel(const std::vector<glm::vec3>& batchPositions)
+{
+	for (int i = 0; i < batchPositions.size(); i++)
+	{
+		for (int j = 0; j < vertices.size(); j++)
+		{
+			batchedVertices.emplace_back(vertices[j]);
+			batchedVertices.back().position += batchPositions[i];
+		}
+		for (int j = 0; j < elements.size(); j++)
+		{
+			batchedElements.emplace_back(elements[j] + (elements.size() * j));
+		}
+	}
+}
+
 void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& Models)
 {
 	LoadPlane(Models, 0);
