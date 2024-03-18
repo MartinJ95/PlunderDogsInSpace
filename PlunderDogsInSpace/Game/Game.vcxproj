@@ -133,12 +133,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CustomBTNodes.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="Team.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomBTNodes.h" />
     <ClInclude Include="PlayerController.h" />
     <ClInclude Include="Sandbox.h" />
     <ClInclude Include="Team.h" />
