@@ -37,7 +37,9 @@ public:
 	std::vector<unsigned int> elements;
 public:
 	void BatchModel(const std::vector<glm::vec3>& batchPositions);
-public:
+	const std::vector<Vertex> GetBatchedVertices() const { return batchedVertices; }
+	const std::vector<unsigned int> GetBatchedElements() const { return batchedElements; }
+private:
 	int batchAmount;
 	std::vector<Vertex> batchedVertices;
 	std::vector<unsigned int> batchedElements;
