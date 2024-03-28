@@ -68,6 +68,7 @@ public:
 		std::swap(VertexArrayObject, other.VertexArrayObject);
 		std::swap(ElementBufferObject, other.ElementBufferObject);
 	}
+	void BufferObject(const bool batched);
 protected:
 	Model m_model;
 protected:

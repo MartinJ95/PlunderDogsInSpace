@@ -59,6 +59,19 @@ void GLModel::SetUpMesh()
 	glBindVertexArray(0);
 }
 
+void GLModel::BufferObject(const bool batched)
+{
+	glBindVertexArray(VertexArrayObject);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex), batched ? &m_model.GetBatchedVertices() : &m_model.vertices);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int), batched ? &m_model.GetBatchedElements() : &m_model.elements);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 Model::Model(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Elements) :
 	vertices(Vertices), elements(Elements)
 {
