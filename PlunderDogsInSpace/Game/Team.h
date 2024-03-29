@@ -136,10 +136,31 @@ public:
 		if (!graphics.DoesModelExist(3))
 			return;
 
+		std::vector<glm::vec3> ParticlePositions;
+
+		for (int i = 0; i < currentParticles; i++)
+		{
+			ParticlePositions.emplace_back(m_particles[i].transform.GetPosition());
+		}
+
+		graphics.GetModel(3).GetModel().BatchModel(ParticlePositions);
+
+		graphics.GetModel(3).BufferObject(true);
+
+		graphics.Render(3, 0, true, glm::mat4(1.f));
+
+		std::vector<glm::vec3> empty;
+
+		graphics.GetModel(3).GetModel().BatchModel(empty);
+
+		graphics.GetModel(3).BufferObject(false);
+
+		/*
 		for (int i = 0; i < currentParticles; i++)
 		{
 			graphics.Render(3, 0, true, m_particles[i].transform.GetModelXform());
 		}
+		*/
 	}
 	void Emit(const ParticleProperties& properties)
 	{
