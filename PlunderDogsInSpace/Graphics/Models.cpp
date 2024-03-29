@@ -21,10 +21,11 @@ VertexBufferObject(other.VertexBufferObject), VertexArrayObject(other.VertexArra
 
 void GLModel::Render(GLShader& s)
 {
-	glBindVertexArray(VertexArrayObject);
+	//glBindVertexArray(VertexArrayObject);
 	// draw mesh
 	glBindVertexArray(VertexArrayObject);
-	glDrawElements(GL_TRIANGLES, m_model.elements.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES,m_model.elements.size(), GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES, m_model.GetBatchAmount() == 0 ? m_model.elements.size() : m_model.GetBatchedElements().size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
@@ -37,11 +38,11 @@ void GLModel::SetUpMesh()
 	glBindVertexArray(VertexArrayObject);
 	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
 
-	glBufferData(GL_ARRAY_BUFFER, m_model.vertices.size() * sizeof(Vertex), &m_model.vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_model.vertices.size() * sizeof(Vertex), &m_model.vertices[0], GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.elements.size() * sizeof(unsigned int),
-		&m_model.elements[0], GL_STATIC_DRAW);
+		&m_model.elements[0], GL_DYNAMIC_DRAW);
 
 	// vertex positions
 	glEnableVertexAttribArray(0);
@@ -63,10 +64,14 @@ void GLModel::BufferObject(const bool batched)
 {
 	glBindVertexArray(VertexArrayObject);
 
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex), batched ? &m_model.GetBatchedVertices() : &m_model.vertices);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int), batched ? &m_model.GetBatchedElements() : &m_model.elements);
+
+	glBindVertexArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -89,6 +94,13 @@ Model::Model(Model&& other) :
 
 void Model::BatchModel(const std::vector<glm::vec3>& batchPositions)
 {
+	batchedVertices.clear();
+	batchedElements.clear();
+	if (batchPositions.size() == 0)
+	{
+		batchAmount = 0;
+		return;
+	}
 	for (int i = 0; i < batchPositions.size(); i++)
 	{
 		for (int j = 0; j < vertices.size(); j++)
@@ -101,6 +113,8 @@ void Model::BatchModel(const std::vector<glm::vec3>& batchPositions)
 			batchedElements.emplace_back(elements[j] + (elements.size() * j));
 		}
 	}
+
+	batchAmount = batchPositions.size();
 }
 
 void GLModelLoading::LoadBaseModels(std::unordered_map<unsigned int, GLModel>& Models)

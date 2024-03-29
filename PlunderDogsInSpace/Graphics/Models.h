@@ -32,15 +32,16 @@ public:
 		vertices = std::move(other.vertices);
 		elements = std::move(other.elements);
 	}
+	unsigned int GetBatchAmount() const { return batchAmount; }
 public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> elements;
 public:
 	void BatchModel(const std::vector<glm::vec3>& batchPositions);
-	const std::vector<Vertex> GetBatchedVertices() const { return batchedVertices; }
-	const std::vector<unsigned int> GetBatchedElements() const { return batchedElements; }
+	std::vector<Vertex>& GetBatchedVertices() { return batchedVertices; }
+	std::vector<unsigned int>& GetBatchedElements() { return batchedElements; }
 private:
-	int batchAmount;
+	int batchAmount = 0;
 	std::vector<Vertex> batchedVertices;
 	std::vector<unsigned int> batchedElements;
 };
@@ -69,6 +70,7 @@ public:
 		std::swap(ElementBufferObject, other.ElementBufferObject);
 	}
 	void BufferObject(const bool batched);
+	Model& GetModel() { return m_model; }
 protected:
 	Model m_model;
 protected:
