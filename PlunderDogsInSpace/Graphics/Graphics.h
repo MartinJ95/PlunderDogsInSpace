@@ -64,6 +64,7 @@ public:
 	virtual void Display() override final;
 	virtual void PollEvents() override final;
 	GLShader& GetShader(const int ID) { return m_shaders.at(ID); }
+	GLModel& GetModel(const int ID) { return m_models.at(ID); }
 	inline bool ShaderExist(const int ID) { return m_shaders.find(ID) != m_shaders.end(); }
 	GLFWwindow* GetWindow() const { return m_window; }
 protected:
