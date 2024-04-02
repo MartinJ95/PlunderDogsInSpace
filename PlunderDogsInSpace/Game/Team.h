@@ -55,7 +55,7 @@ struct Particle
 class Emitter
 {
 public:
-	Emitter(const unsigned int MaxParticles, bool Initialise = true) : maxParticles(MaxParticles), m_particles(), currentParticles(0), emitTime(0.005f), emitTimer(0.f)
+	Emitter(const unsigned int MaxParticles, bool Initialise = true) : maxParticles(MaxParticles), m_particles(), currentParticles(0), emitTime(0.05f), emitTimer(0.f)
 	{
 		if (Initialise)
 		{
@@ -143,24 +143,24 @@ public:
 			ParticlePositions.emplace_back(m_particles[i].transform.GetPosition());
 		}
 
-		graphics.GetModel(3).GetModel().BatchModel(ParticlePositions);
+		//graphics.GetModel(2).GetModel().BatchModel(ParticlePositions);
 
-		graphics.GetModel(3).BufferObject(true);
+		//graphics.GetModel(2).BufferObject(true);
 
-		graphics.Render(3, 0, true, glm::mat4(1.f));
+		//graphics.Render(2, 0, true, glm::mat4(1.f));
 
-		std::vector<glm::vec3> empty;
+		//std::vector<glm::vec3> empty;
 
-		graphics.GetModel(3).GetModel().BatchModel(empty);
+		//graphics.GetModel(2).GetModel().BatchModel(empty);
 
-		graphics.GetModel(3).BufferObject(false);
+		//graphics.GetModel(2).BufferObject(false);
 
-		/*
+		
 		for (int i = 0; i < currentParticles; i++)
 		{
 			graphics.Render(3, 0, true, m_particles[i].transform.GetModelXform());
 		}
-		*/
+		
 	}
 	void Emit(const ParticleProperties& properties)
 	{
