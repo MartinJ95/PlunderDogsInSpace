@@ -33,6 +33,15 @@ public:
 		elements = std::move(other.elements);
 	}
 	unsigned int GetBatchAmount() const { return batchAmount; }
+	bool IsNewBatchBigger() 
+	{
+		if (batchAmount <= lastHighestBatchAmount)
+			return false;
+
+		lastHighestBatchAmount = batchAmount;
+
+		return true;
+	}
 public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> elements;
@@ -42,6 +51,7 @@ public:
 	std::vector<unsigned int>& GetBatchedElements() { return batchedElements; }
 private:
 	int batchAmount = 0;
+	int lastHighestBatchAmount = 0;
 	std::vector<Vertex> batchedVertices;
 	std::vector<unsigned int> batchedElements;
 };

@@ -24,8 +24,8 @@ void GLModel::Render(GLShader& s)
 	//glBindVertexArray(VertexArrayObject);
 	// draw mesh
 	glBindVertexArray(VertexArrayObject);
-	glDrawElements(GL_TRIANGLES,m_model.elements.size(), GL_UNSIGNED_INT, 0);
-	//glDrawElements(GL_TRIANGLES, m_model.GetBatchAmount() == 0 ? m_model.elements.size() : m_model.GetBatchedElements().size(), GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES,m_model.elements.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_model.GetBatchAmount() == 0 ? m_model.elements.size() : m_model.GetBatchedElements().size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
@@ -65,16 +65,65 @@ void GLModel::BufferObject(const bool batched)
 	glBindVertexArray(VertexArrayObject);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex), batched ? &m_model.GetBatchedVertices() : &m_model.vertices);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int), batched ? &m_model.GetBatchedElements() : &m_model.elements);
+
+	if (!batched)
+	{
+		//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex), &m_model.vertices);
+		//glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int), &m_model.elements);
+		glBufferData(GL_ARRAY_BUFFER, m_model.vertices.size() * sizeof(Vertex), &m_model.vertices[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.elements.size() * sizeof(unsigned int), &m_model.elements[0], GL_DYNAMIC_DRAW);
+
+		// vertex positions
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+		// vertex color
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+		// vertex normal
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+		//vertex trexcoord
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+		glBindVertexArray(0);
+
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		return;
+	}
+
+	if (m_model.IsNewBatchBigger())
+	{
+		glBufferData(GL_ARRAY_BUFFER, m_model.GetBatchedVertices().size() * sizeof(Vertex), &m_model.GetBatchedVertices(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.GetBatchedElements().size() * sizeof(unsigned int), &m_model.GetBatchedElements(), GL_DYNAMIC_DRAW);
+	}
+	else
+	{
+		//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex), &m_model.GetBatchedVertices());
+		//glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int), &m_model.GetBatchedElements());
+		glBufferData(GL_ARRAY_BUFFER, m_model.GetBatchedVertices().size() * sizeof(Vertex), &m_model.GetBatchedVertices(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.GetBatchedElements().size() * sizeof(unsigned int), &m_model.GetBatchedElements(), GL_DYNAMIC_DRAW);
+	}
+
+	// vertex positions
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	// vertex color
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	// vertex normal
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	//vertex trexcoord
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
 	glBindVertexArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 Model::Model(std::vector<Vertex>&& Vertices, std::vector<unsigned int>&& Elements) :
