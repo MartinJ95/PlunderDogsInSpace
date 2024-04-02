@@ -19,6 +19,10 @@ public:
 		scale = Scale;
 		dirtyXForm = true;
 	}
+	glm::vec3 GetForwardVector() const
+	{
+		return glm::vec3(1, 0, 0) * rotation;
+	}
 private:
 	void CalculateXForm();
 private:
