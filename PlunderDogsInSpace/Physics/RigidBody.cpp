@@ -108,8 +108,8 @@ void Transform::CalculateXForm()
 {
 	glm::mat4 newMat = glm::mat4(1.f);
 	newMat = glm::translate(newMat, position);
-	newMat = glm::scale(newMat, scale);
 	newMat *= glm::mat4_cast(rotation);
+	newMat = glm::scale(newMat, scale);
 	modelXForm = newMat;
 	dirtyXForm = false;
 }

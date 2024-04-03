@@ -104,6 +104,9 @@ BTNodeResult BTShipLookingAtTarget::Evaluate(void* ptr) const
 
 	ShipAIData* data = static_cast<ShipAIData*>(ptr);
 
+	if (data->targetShip == nullptr)
+		return BTNodeResult::eBTFail;
+
 	if (glm::dot(glm::normalize(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()), data->owner->m_transform.GetForwardVector()) > 0.75f)
 	{
 		return BTNodeResult::eBTSuccess;
@@ -128,4 +131,9 @@ BTNodeResult BTShipRotateToTarget::Evaluate(void* ptr) const
 	float angleBetween = glm::acos(glm::dot(glm::normalize(toTargetShip), data->owner->m_transform.GetForwardVector()));
 
 	data->owner->m_transform.SetRotation(data->owner->m_transform.GetRotation() * glm::quat(glm::vec3(0, rightSide ? angleBetween : -angleBetween, 0)));
+}
+
+BTNodeResult BTSucceed::Evaluate(void* ptr) const
+{
+	return BTNodeResult::eBTSuccess;
 }

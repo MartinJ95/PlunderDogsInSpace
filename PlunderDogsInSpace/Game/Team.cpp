@@ -63,6 +63,13 @@ void Ship::Init(Team* OwningTeam)
 	{
 		m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipSetMoveToLocationObj)));
 	}
+	m_tree.GetRoot()->AddChild(std::move(new BTSelectorNode()));
+	BTSelectorNode* SN = static_cast<BTSelectorNode*>(m_tree.GetRoot()->GetChildren().back());
+	SN->AddChild(std::move(new BTSelectorNode()));
+	BTSelectorNode* SN2 = static_cast<BTSelectorNode*>(SN->GetChildren().back());
+	SN2->AddChild(std::move(new BTDecoratorNode(&BTShipLookingAtTargetObj)));
+	SN2->AddChild(std::move(new BTDecoratorNode(&BTShipRotateToTargetObj)));
+	SN->AddChild(std::move(new BTDecoratorNode(&BTSucceedObj)));
 	//m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipSetMoveToLocationObj)));
 	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipMoveToLocationObj)));
 	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipShootAtTargetObj)));
@@ -80,7 +87,7 @@ void Ship::Update()
 
 	m_weapon.Update();
 
-	m_tree.Evaluate(&m_shipAIData);
+	//m_tree.Evaluate(&m_shipAIData);
 }
 
 void Ship::Render(const unsigned int RenderPass)
