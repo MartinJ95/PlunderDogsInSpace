@@ -89,9 +89,43 @@ BTNodeResult BTShipShootAtTarget::Evaluate(void* ptr) const
 	if (data->targetShip == nullptr)
 		return BTNodeResult::eBTFail;
 
-	if (glm::length(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()) < data->owner->GetWeapon().weapon->range)
+	if (glm::length(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()) < data->owner->GetWeapon().weapon->range
+		&& glm::dot(glm::normalize(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()), glm::normalize(data->owner->m_transform.GetForwardVector())) > 0.75)
 	{
 		data->owner->GetWeapon().Shoot(data->owningTeam, glm::normalize(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()), data->owner->m_transform.GetPosition());
 		return BTNodeResult::eBTSuccess;
 	}
+}
+
+BTNodeResult BTShipLookingAtTarget::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTFail;
+
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	if (glm::dot(glm::normalize(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()), data->owner->m_transform.GetForwardVector()) > 0.75f)
+	{
+		return BTNodeResult::eBTSuccess;
+	}
+	return BTNodeResult::eBTFail;
+}
+
+BTNodeResult BTShipRotateToTarget::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTFail;
+
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	glm::vec3 toTargetShip = data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition();
+
+	bool rightSide = glm::dot(
+		glm::cross(glm::normalize(data->owner->m_transform.GetForwardVector()), glm::vec3(0, 1, 0)),
+		glm::normalize(toTargetShip)
+	) > 0 ? true : false;
+
+	float angleBetween = glm::acos(glm::dot(glm::normalize(toTargetShip), data->owner->m_transform.GetForwardVector()));
+
+	data->owner->m_transform.SetRotation(data->owner->m_transform.GetRotation() * glm::quat(glm::vec3(0, rightSide ? angleBetween : -angleBetween, 0)));
 }
