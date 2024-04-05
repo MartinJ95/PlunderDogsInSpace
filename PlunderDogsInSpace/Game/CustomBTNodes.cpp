@@ -107,7 +107,7 @@ BTNodeResult BTShipLookingAtTarget::Evaluate(void* ptr) const
 	if (data->targetShip == nullptr)
 		return BTNodeResult::eBTFail;
 
-	if (glm::dot(glm::normalize(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()), data->owner->m_transform.GetForwardVector()) > 0.75f)
+	if (glm::dot(glm::normalize(data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition()), data->owner->m_transform.GetForwardVector()) > 0.95f)
 	{
 		return BTNodeResult::eBTSuccess;
 	}
@@ -120,6 +120,9 @@ BTNodeResult BTShipRotateToTarget::Evaluate(void* ptr) const
 		return BTNodeResult::eBTFail;
 
 	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	if (data->targetShip == nullptr)
+		return BTNodeResult::eBTFail;
 
 	glm::vec3 toTargetShip = data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition();
 
