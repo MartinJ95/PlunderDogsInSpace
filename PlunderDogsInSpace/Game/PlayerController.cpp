@@ -149,7 +149,7 @@ void PlayerController::Update()
             m_selectedShips.clear();
             for (Ship& s : sandBox->GetTeam(1).GetShips())
             {
-                glm::vec2 point = glm::vec2(s.m_transform.GetPosition().x, s.m_transform.GetPosition().y);
+                glm::vec2 point = glm::vec2(s.m_transform.GetPosition().x, s.m_transform.GetPosition().z);
                 AABB box;
                 box.min = glm::vec2(m_selectionBox.min.x, m_selectionBox.min.z);
                 box.max = glm::vec2(m_selectionBox.max.x, m_selectionBox.max.z);
