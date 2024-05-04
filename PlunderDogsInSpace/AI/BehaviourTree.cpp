@@ -81,3 +81,7 @@ BTNodeResult BTDecoratorNode::Evaluate(void* ptr)
 {
     return m_action->Evaluate(ptr);
 }
+
+BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::move(Trees))
+{
+}

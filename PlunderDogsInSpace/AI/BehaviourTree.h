@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 
 enum class BTNodeResult
 {
@@ -69,3 +70,10 @@ protected:
 	BTSelectorNode* m_root;
 };
 
+class BehaviourState
+{
+public:
+	BehaviourState(std::vector<BehaviourTree>&& Trees);
+private:
+	std::vector<BehaviourTree> trees;
+};
