@@ -71,6 +71,12 @@ protected:
 	BTSelectorNode* m_root;
 };
 
+struct BehaviourCustomState
+{
+	virtual void ConstructState() = 0;
+};
+
+
 class BehaviourState
 {
 public:
