@@ -87,6 +87,10 @@ BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::
 {
 }
 
+void BehaviourState::InitStates()
+{
+}
+
 BehaviourState& BehaviourState::GetState(const std::string& StateName)
 {
     std::unordered_map<std::string, BehaviourState>::iterator state;

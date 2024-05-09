@@ -76,11 +76,11 @@ struct BehaviourCustomState
 	virtual void ConstructState() = 0;
 };
 
-
 class BehaviourState
 {
 public:
 	BehaviourState(std::vector<BehaviourTree>&& Trees);
+	static void InitStates();
 	static BehaviourState& GetState(const std::string& StateName);
 private:
 	std::vector<BehaviourTree> trees;
