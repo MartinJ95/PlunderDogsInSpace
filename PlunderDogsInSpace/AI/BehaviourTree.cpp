@@ -1,4 +1,5 @@
 #include "BehaviourTree.h"
+#include <cassert>
 
 BTNodeResult BTSelectorNode::Evaluate(void* ptr)
 {
@@ -84,4 +85,14 @@ BTNodeResult BTDecoratorNode::Evaluate(void* ptr)
 
 BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::move(Trees))
 {
+}
+
+BehaviourState& BehaviourState::GetState(const std::string& StateName)
+{
+    std::unordered_map<std::string, BehaviourState>::iterator state;
+    state = States.find(StateName);
+
+    assert((state != States.end()));
+
+    return state->second;
 }

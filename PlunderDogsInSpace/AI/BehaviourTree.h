@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 enum class BTNodeResult
 {
@@ -74,6 +75,8 @@ class BehaviourState
 {
 public:
 	BehaviourState(std::vector<BehaviourTree>&& Trees);
+	static BehaviourState& GetState(const std::string& StateName);
 private:
 	std::vector<BehaviourTree> trees;
+	static std::unordered_map<std::string, BehaviourState> States;
 };
