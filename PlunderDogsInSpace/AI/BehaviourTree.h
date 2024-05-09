@@ -71,10 +71,14 @@ protected:
 	BTSelectorNode* m_root;
 };
 
+class BehaviourState;
+
 struct BehaviourCustomState
 {
-	virtual void ConstructState() = 0;
+	virtual void ConstructState(std::unordered_map<std::string, BehaviourState>& States) = 0;
 };
+
+static std::vector<BehaviourCustomState*> BehaviourStateObjs;
 
 class BehaviourState
 {

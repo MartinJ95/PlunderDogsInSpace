@@ -83,6 +83,8 @@ BTNodeResult BTDecoratorNode::Evaluate(void* ptr)
     return m_action->Evaluate(ptr);
 }
 
+std::unordered_map<std::string, BehaviourState> BehaviourState::States;
+
 BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::move(Trees))
 {
 }
