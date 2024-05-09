@@ -91,6 +91,11 @@ BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::
 
 void BehaviourState::InitStates()
 {
+    for (std::vector<BehaviourCustomState*>::iterator it = BehaviourStateObjs.begin(); it != BehaviourStateObjs.end(); it++)
+    {
+        BehaviourCustomState* ref = *it;
+        ref->ConstructState(States);
+    }
 }
 
 BehaviourState& BehaviourState::GetState(const std::string& StateName)
