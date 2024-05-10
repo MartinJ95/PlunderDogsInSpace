@@ -75,7 +75,7 @@ class BehaviourState;
 
 struct BehaviourCustomState
 {
-	virtual void ConstructState(std::unordered_map<std::string, BehaviourState>& States) = 0;
+	virtual void ConstructState(std::unordered_map<std::string, BehaviourState>& States) const = 0;
 };
 
 static std::vector<BehaviourCustomState*> BehaviourStateObjs;

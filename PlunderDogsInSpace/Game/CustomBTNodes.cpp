@@ -140,3 +140,31 @@ BTNodeResult BTSucceed::Evaluate(void* ptr) const
 {
 	return BTNodeResult::eBTSuccess;
 }
+
+BTNodeResult BTHasGotTarget::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTSuccess;
+
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	if (data->targetShip == nullptr)
+		return BTNodeResult::eBTSuccess;
+
+	return BTNodeResult::eBTFail;
+}
+
+void AIFindingTarget::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
+{
+	BehaviourTree tree(new BTSelectorNode);
+	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTHasGotTargetObj));
+	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipFindTargetObj));
+
+	States.emplace(
+		std::pair<std::string, BehaviourState>{
+		std::string("Finding Target"),
+			BehaviourState(
+				std::vector<BehaviourTree>{std::move(tree)}
+		)});
+}
+
