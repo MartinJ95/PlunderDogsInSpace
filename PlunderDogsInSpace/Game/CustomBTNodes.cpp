@@ -167,3 +167,18 @@ void AIFindingTarget::ConstructState(std::unordered_map<std::string, BehaviourSt
 				std::vector<BehaviourTree>{std::move(tree)}
 		)});
 }
+
+void ShootAtTarget::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
+{
+	BehaviourTree tree(new BTSequenceNode);
+	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTHasGotTargetObj));
+	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipLookingAtTargetObj));
+	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipShootAtTargetObj));
+
+	States.emplace(
+		std::pair<std::string, BehaviourState>{
+		std::string("shooting at target"),
+			BehaviourState(
+				std::vector<BehaviourTree>{std::move(tree)}
+		)});
+}
