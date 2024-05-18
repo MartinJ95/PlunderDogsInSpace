@@ -182,3 +182,7 @@ void ShootAtTarget::ConstructState(std::unordered_map<std::string, BehaviourStat
 				std::vector<BehaviourTree>{std::move(tree)}
 		)});
 }
+
+void MoveToTargetocation::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
+{
+}
