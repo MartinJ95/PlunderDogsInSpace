@@ -185,4 +185,13 @@ void ShootAtTarget::ConstructState(std::unordered_map<std::string, BehaviourStat
 
 void MoveToTargetocation::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
 {
+	BehaviourTree tree(new BTSelectorNode);
+	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipMoveToLocationObj));
+
+	States.emplace(
+		std::pair<std::string, BehaviourState>{
+		std::string("moving to location"),
+			BehaviourState(std::vector<BehaviourTree>{std::move(tree)})
+	}
+	);
 }
