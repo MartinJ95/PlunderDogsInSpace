@@ -154,6 +154,18 @@ BTNodeResult BTHasGotTarget::Evaluate(void* ptr) const
 	return BTNodeResult::eBTSuccess;
 }
 
+BTNodeResult BTSetPhysicsMoveForward::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTFail;
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	if (data->targetShip == nullptr)
+		return BTNodeResult::eBTFail;
+
+}
+
+
 void AIFindingTarget::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
 {
 	BehaviourTree tree(new BTSelectorNode);
@@ -195,3 +207,4 @@ void MoveToTargetocation::ConstructState(std::unordered_map<std::string, Behavio
 	}
 	);
 }
+

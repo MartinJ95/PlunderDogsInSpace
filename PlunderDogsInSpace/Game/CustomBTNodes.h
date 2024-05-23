@@ -41,6 +41,11 @@ struct BTHasGotTarget : public BTAction
 	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
 };
 
+struct BTSetPhysicsMoveForward : public BTAction
+{
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
+};
+
 constexpr BTShipFindTarget BTShipFindTargetObj;
 constexpr BTShipSetMoveToLocation BTShipSetMoveToLocationObj;
 constexpr BTShipMoveToLocation BTShipMoveToLocationObj;
