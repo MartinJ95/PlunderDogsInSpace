@@ -305,6 +305,23 @@ struct ShipStates
 	BehaviourState* movement;
 	BehaviourState* targeting;
 	BehaviourState* engaging;
+public:
+	void EvaluateStates(ShipAIData& data)
+	{
+		RunState(data, movementDecisionMaking);
+		RunState(data, movement);
+		RunState(data, targeting);
+		RunState(data, engaging);
+	}
+private:
+	void RunState(ShipAIData& data, BehaviourState* state)
+	{
+		if (state == nullptr)
+			return;
+
+		state->EvaluateState(&data);
+	}
+
 };
 
 struct Ship
