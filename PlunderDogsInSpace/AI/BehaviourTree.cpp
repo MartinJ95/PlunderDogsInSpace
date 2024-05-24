@@ -89,7 +89,7 @@ BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::
 {
 }
 
-void BehaviourState::EvaluateState(void* ptr = nullptr)
+void BehaviourState::EvaluateState(void* ptr)
 {
     for (std::vector<BehaviourTree>::iterator it = trees.begin(); it != trees.end(); it++)
     {
