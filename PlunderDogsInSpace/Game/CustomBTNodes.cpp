@@ -114,6 +114,20 @@ BTNodeResult BTShipLookingAtTarget::Evaluate(void* ptr) const
 	return BTNodeResult::eBTFail;
 }
 
+inline void RotateTowardsPoint(const glm::vec3& TargetPoint, Transform& ShipTransform, const float RotationSpeed = 1.f)
+{
+	glm::vec3 toTargetPoint = TargetPoint - ShipTransform.GetPosition();
+
+	bool rightSide = glm::dot(
+		glm::cross(glm::normalize(ShipTransform.GetForwardVector()), glm::vec3(0, 1, 0)),
+		glm::normalize(toTargetPoint)
+	) > 0 ? true : false;
+
+	float angleBetween = glm::acos(glm::dot(glm::normalize(toTargetPoint), ShipTransform.GetForwardVector()));
+
+	ShipTransform.SetRotation(ShipTransform.GetRotation() * glm::quat(glm::vec3(0, rightSide ? angleBetween : -angleBetween, 0)));
+}
+
 BTNodeResult BTShipRotateToTarget::Evaluate(void* ptr) const
 {
 	if (ptr == nullptr)
@@ -124,16 +138,23 @@ BTNodeResult BTShipRotateToTarget::Evaluate(void* ptr) const
 	if (data->targetShip == nullptr)
 		return BTNodeResult::eBTFail;
 
-	glm::vec3 toTargetShip = data->targetShip->m_transform.GetPosition() - data->owner->m_transform.GetPosition();
 
-	bool rightSide = glm::dot(
-		glm::cross(glm::normalize(data->owner->m_transform.GetForwardVector()), glm::vec3(0, 1, 0)),
-		glm::normalize(toTargetShip)
-	) > 0 ? true : false;
+	RotateTowardsPoint(data->targetShip->m_transform.GetPosition(), data->owner->m_transform);
+}
 
-	float angleBetween = glm::acos(glm::dot(glm::normalize(toTargetShip), data->owner->m_transform.GetForwardVector()));
+BTNodeResult BTShipRotateToTargetLocation::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTFail;
 
-	data->owner->m_transform.SetRotation(data->owner->m_transform.GetRotation() * glm::quat(glm::vec3(0, rightSide ? angleBetween : -angleBetween, 0)));
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	glm::vec3 toTargetLocation = data->targetLocation - data->owner->m_transform.GetPosition();
+
+	if (glm::length(toTargetLocation) < 2.f)
+		return BTNodeResult::eBTFail;
+	
+	RotateTowardsPoint(data->targetLocation, data->owner->m_transform);
 }
 
 BTNodeResult BTSucceed::Evaluate(void* ptr) const

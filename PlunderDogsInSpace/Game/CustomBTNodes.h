@@ -31,6 +31,11 @@ struct BTShipRotateToTarget : public BTAction
 	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
 };
 
+struct BTShipRotateToTargetLocation : public BTAction
+{
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
+};
+
 struct BTSucceed : public BTAction
 {
 	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
