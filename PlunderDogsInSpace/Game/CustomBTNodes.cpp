@@ -163,8 +163,24 @@ BTNodeResult BTSetPhysicsMoveForward::Evaluate(void* ptr) const
 	if (data->targetShip == nullptr)
 		return BTNodeResult::eBTFail;
 
+	Ship* ship = data->owner;
+
+	ship->m_body.SetForce(ship->m_transform.GetForwardVector());
 }
 
+BTNodeResult BTSetPhysicsMoveBackword::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTFail;
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	if (data->targetShip == nullptr)
+		return BTNodeResult::eBTFail;
+
+	Ship* ship = data->owner;
+
+	ship->m_body.SetForce(-ship->m_transform.GetForwardVector());
+}
 
 void AIFindingTarget::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
 {
