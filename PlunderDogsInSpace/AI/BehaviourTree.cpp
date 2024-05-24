@@ -89,6 +89,14 @@ BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::
 {
 }
 
+void BehaviourState::EvaluateState(void* ptr = nullptr)
+{
+    for (std::vector<BehaviourTree>::iterator it = trees.begin(); it != trees.end(); it++)
+    {
+        it->Evaluate(ptr);
+    }
+}
+
 void BehaviourState::InitStates()
 {
     for (std::vector<BehaviourCustomState*>::iterator it = BehaviourStateObjs.begin(); it != BehaviourStateObjs.end(); it++)

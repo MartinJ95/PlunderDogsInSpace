@@ -84,6 +84,7 @@ class BehaviourState
 {
 public:
 	BehaviourState(std::vector<BehaviourTree>&& Trees);
+	void EvaluateState(void* ptr = nullptr);
 	static void InitStates();
 	static BehaviourState& GetState(const std::string& StateName);
 private:
