@@ -182,6 +182,20 @@ BTNodeResult BTSetPhysicsMoveBackword::Evaluate(void* ptr) const
 	ship->m_body.SetForce(-ship->m_transform.GetForwardVector());
 }
 
+BTNodeResult BTApplyPhysics::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTFail;
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	if (data->targetShip == nullptr)
+		return BTNodeResult::eBTFail;
+
+	Ship* ship = data->owner;
+
+	ship->m_body.ApplyPhysics(ServiceLocator::GetTimeService().deltaTime, ship->m_transform);
+}
+
 void AIFindingTarget::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
 {
 	BehaviourTree tree(new BTSelectorNode);

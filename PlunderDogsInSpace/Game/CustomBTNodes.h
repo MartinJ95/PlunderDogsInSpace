@@ -51,6 +51,11 @@ struct BTSetPhysicsMoveBackword : public BTAction
 	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
 };
 
+struct BTApplyPhysics : public BTAction
+{
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
+};
+
 constexpr BTShipFindTarget BTShipFindTargetObj;
 constexpr BTShipSetMoveToLocation BTShipSetMoveToLocationObj;
 constexpr BTShipMoveToLocation BTShipMoveToLocationObj;
