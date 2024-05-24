@@ -90,5 +90,10 @@ struct FindTargetMoveLocation : public BehaviourCustomState
 	virtual void ConstructState(std::unordered_map<std::string, BehaviourState>& States) const override final;
 };
 
+struct EmptyState : public BehaviourCustomState
+{
+	virtual void ConstructState(std::unordered_map<std::string, BehaviourState>& States) const override final;
+};
+
 constexpr AIFindingTarget AIFindingTargetObj;
 constexpr ShootAtTarget ShootAtTargetObj;

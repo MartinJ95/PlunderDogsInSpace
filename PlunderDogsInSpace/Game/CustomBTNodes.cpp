@@ -269,3 +269,14 @@ void FindTargetMoveLocation::ConstructState(std::unordered_map<std::string, Beha
 		std::string("set move to location"),
 			BehaviourState(std::vector<BehaviourTree>{std::move(tree)})});
 }
+
+void EmptyState::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
+{
+	BehaviourTree tree(new BTSelectorNode);
+	
+	States.emplace(
+		std::pair<std::string, BehaviourState>{
+		std::string("none"),
+			BehaviourState(std::vector<BehaviourTree>{std::move(tree)})}
+	);
+}
