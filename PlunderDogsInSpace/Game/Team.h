@@ -299,6 +299,14 @@ constexpr glm::vec3 HealthbarScale = glm::vec3(1.f, 1.f, 0.2f);
 
 constexpr float HealthBarHideTime{ 2.5f };
 
+struct ShipStates
+{
+	BehaviourState* movementDecisionMaking;
+	BehaviourState* movement;
+	BehaviourState* targeting;
+	BehaviourState* engaging;
+};
+
 struct Ship
 {
 	Ship();
@@ -313,6 +321,7 @@ struct Ship
 		m_body = other.m_body;
 		m_collider = other.m_collider;
 		m_tree = other.m_tree;
+		m_behaviourStates = other.m_behaviourStates;
 		currentHealth = other.currentHealth;
 		m_shipAIData = other.m_shipAIData;
 		m_shipAIData.owner = this;
@@ -330,6 +339,7 @@ struct Ship
 		m_body = other.m_body;
 		m_collider = other.m_collider;
 		m_tree = std::move(other.m_tree);
+		m_behaviourStates = std::move(other.m_behaviourStates);
 		currentHealth = other.currentHealth;
 		m_shipAIData = other.m_shipAIData;
 		m_shipAIData.owner = this;
@@ -344,6 +354,7 @@ struct Ship
 	RigidBody m_body;
 	SphereCollider m_collider;
 	BehaviourTree m_tree;
+	ShipStates m_behaviourStates;
 	float currentHealth;
 	void Init(Team* OwningTeam);
 	void Update();
