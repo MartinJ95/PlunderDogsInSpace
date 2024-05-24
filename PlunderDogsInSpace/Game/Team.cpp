@@ -78,6 +78,7 @@ void Ship::Init(Team* OwningTeam)
 void Ship::Update()
 {
 	m_tree.Evaluate(&m_shipAIData);
+	m_behaviourStates.EvaluateStates(m_shipAIData);
 
 	m_body.ApplyPhysics(ServiceLocator::GetTimeService().deltaTime, m_transform);
 	m_transform.CheckModelXForm();
