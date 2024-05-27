@@ -119,13 +119,18 @@ inline void RotateTowardsPoint(const glm::vec3& TargetPoint, Transform& ShipTran
 	glm::vec3 toTargetPoint = TargetPoint - ShipTransform.GetPosition();
 
 	bool rightSide = glm::dot(
-		glm::cross(glm::normalize(ShipTransform.GetForwardVector()), glm::vec3(0, 1, 0)),
+		glm::normalize(glm::cross(glm::normalize(ShipTransform.GetForwardVector()), glm::vec3(0, 1, 0))),
 		glm::normalize(toTargetPoint)
 	) > 0 ? true : false;
 
 	float angleBetween = glm::acos(glm::dot(glm::normalize(toTargetPoint), ShipTransform.GetForwardVector()));
 
-	ShipTransform.SetRotation(ShipTransform.GetRotation() * glm::quat(glm::vec3(0, rightSide ? angleBetween : -angleBetween, 0)));
+	glm::quat newRot = ShipTransform.GetRotation() * glm::quat(glm::vec3(0, rightSide ? angleBetween : -angleBetween, 0));
+
+	if (newRot != newRot)
+		return;
+
+	ShipTransform.SetRotation(newRot);
 }
 
 BTNodeResult BTShipRotateToTarget::Evaluate(void* ptr) const
@@ -259,9 +264,14 @@ void MoveToTargetLocation::ConstructState(std::unordered_map<std::string, Behavi
 	BehaviourTree tree(new BTSelectorNode);
 	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipMoveToLocationObj));
 
+	BehaviourTree rotationTree(new BTSelectorNode);
+	rotationTree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipRotateToTargetObj));
+
 	std::vector<BehaviourTree> trees;
+	trees.reserve(2);
 
 	trees.emplace_back(std::move(tree));
+	trees.emplace_back(std::move(rotationTree));
 
 	BehaviourState state{ std::move(trees) };
 
