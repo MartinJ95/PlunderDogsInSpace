@@ -23,6 +23,8 @@ bool Sandbox::Init()
         (BehaviourCustomState*)&ShootAtTargetObj
     }));
 
+    BehaviourState::InitStates();
+
     team1.Init(&team2);
     team2.Init(&team1);
     testPlanet.m_transform.SetPosition(glm::vec3(0.f, -10.f, -5.f));
