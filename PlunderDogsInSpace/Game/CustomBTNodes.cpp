@@ -223,12 +223,16 @@ void AIFindingTarget::ConstructState(std::unordered_map<std::string, BehaviourSt
 	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTHasGotTargetObj));
 	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipFindTargetObj));
 
+	std::vector<BehaviourTree> trees;
+
+	trees.emplace_back(std::move(tree));
+
+	BehaviourState state{ std::move(trees) };
+
 	States.emplace(
 		std::pair<std::string, BehaviourState>{
 		std::string("Finding Target"),
-			BehaviourState(
-				std::vector<BehaviourTree>{std::move(tree)}
-		)});
+			std::move(state)});
 }
 
 void ShootAtTarget::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
@@ -238,23 +242,33 @@ void ShootAtTarget::ConstructState(std::unordered_map<std::string, BehaviourStat
 	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipLookingAtTargetObj));
 	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipShootAtTargetObj));
 
+	std::vector<BehaviourTree> trees;
+
+	trees.emplace_back(std::move(tree));
+
+	BehaviourState state{ std::move(trees) };
+
 	States.emplace(
 		std::pair<std::string, BehaviourState>{
 		std::string("shooting at target"),
-			BehaviourState(
-				std::vector<BehaviourTree>{std::move(tree)}
-		)});
+			std::move(state)});
 }
 
-void MoveToTargetocation::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
+void MoveToTargetLocation::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
 {
 	BehaviourTree tree(new BTSelectorNode);
 	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipMoveToLocationObj));
 
+	std::vector<BehaviourTree> trees;
+
+	trees.emplace_back(std::move(tree));
+
+	BehaviourState state{ std::move(trees) };
+
 	States.emplace(
 		std::pair<std::string, BehaviourState>{
 		std::string("moving to location"),
-			BehaviourState(std::vector<BehaviourTree>{std::move(tree)})
+			std::move(state)
 	}
 	);
 }
@@ -264,19 +278,31 @@ void FindTargetMoveLocation::ConstructState(std::unordered_map<std::string, Beha
 	BehaviourTree tree(new BTSelectorNode);
 	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipSetMoveToLocationObj));
 
+	std::vector<BehaviourTree> trees;
+
+	trees.emplace_back(std::move(tree));
+
+	BehaviourState state{ std::move(trees) };
+
 	States.emplace(
 		std::pair<std::string, BehaviourState>{
 		std::string("set move to location"),
-			BehaviourState(std::vector<BehaviourTree>{std::move(tree)})});
+			std::move(state)});
 }
 
 void EmptyState::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
 {
 	BehaviourTree tree(new BTSelectorNode);
 	
+	std::vector<BehaviourTree> trees;
+
+	trees.emplace_back(tree);
+
+	BehaviourState state{ std::move(trees) };
+
 	States.emplace(
 		std::pair<std::string, BehaviourState>{
 		std::string("none"),
-			BehaviourState(std::vector<BehaviourTree>{std::move(tree)})}
+			std::move(state)}
 	);
 }

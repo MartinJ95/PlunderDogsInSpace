@@ -20,7 +20,8 @@ bool Sandbox::Init()
         (BehaviourCustomState*)&EmptyStateObj,
         (BehaviourCustomState*)&FindTargetLocationObj,
         (BehaviourCustomState*)&AIFindingTargetObj,
-        (BehaviourCustomState*)&ShootAtTargetObj
+        (BehaviourCustomState*)&ShootAtTargetObj,
+        (BehaviourCustomState*)&MoveToTargetLocationObj
     }));
 
     BehaviourState::InitStates();

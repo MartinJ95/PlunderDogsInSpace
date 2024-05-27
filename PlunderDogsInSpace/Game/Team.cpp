@@ -57,8 +57,15 @@ markedForDeletion(other.markedForDeletion), m_shipAIData(other.m_shipAIData), m_
 void Ship::Init(Team* OwningTeam)
 {
 	m_shipAIData.owningTeam = OwningTeam;
+	m_behaviourStates.targeting = &BehaviourState::GetState("Finding Target");
+	if (OwningTeam->isAI)
+	{
+		m_behaviourStates.movementDecisionMaking = &BehaviourState::GetState("set move to location");
+	}
+	m_behaviourStates.movement = &BehaviourState::GetState("moving to location");
+	m_behaviourStates.engaging = &BehaviourState::GetState("shooting at target");
 
-	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipFindTargetObj)));
+	/*m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipFindTargetObj)));
 	if (OwningTeam->isAI)
 	{
 		m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipSetMoveToLocationObj)));
@@ -73,6 +80,7 @@ void Ship::Init(Team* OwningTeam)
 	//m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipSetMoveToLocationObj)));
 	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipMoveToLocationObj)));
 	m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipShootAtTargetObj)));
+	*/
 }
 
 void Ship::Update()
