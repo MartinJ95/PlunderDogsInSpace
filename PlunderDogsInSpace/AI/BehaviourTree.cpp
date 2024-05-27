@@ -89,20 +89,17 @@ BehaviourState::BehaviourState(std::vector<BehaviourTree>&& Trees) : trees(std::
 {
 }
 
+BehaviourState::BehaviourState(const BehaviourState& other) : trees(other.trees)
+{}
+
+BehaviourState::BehaviourState(BehaviourState&& other) : trees(std::move(other.trees))
+{}
+
 void BehaviourState::EvaluateState(void* ptr)
 {
     for (std::vector<BehaviourTree>::iterator it = trees.begin(); it != trees.end(); it++)
     {
         it->Evaluate(ptr);
-    }
-}
-
-void BehaviourState::InitStates()
-{
-    for (std::vector<BehaviourCustomState*>::iterator it = BehaviourStateObjs.begin(); it != BehaviourStateObjs.end(); it++)
-    {
-        BehaviourCustomState* ref = *it;
-        ref->ConstructState(States);
     }
 }
 

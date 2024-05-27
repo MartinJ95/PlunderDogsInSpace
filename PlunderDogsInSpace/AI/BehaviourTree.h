@@ -84,8 +84,25 @@ class BehaviourState
 {
 public:
 	BehaviourState(std::vector<BehaviourTree>&& Trees);
+	BehaviourState(const BehaviourState& other);
+	BehaviourState(BehaviourState&& other);
+	void operator=(const BehaviourState& other)
+	{
+		trees = other.trees;
+	}
+	void operator=(BehaviourState&& other)
+	{
+		trees = std::move(other.trees);
+	}
 	void EvaluateState(void* ptr = nullptr);
-	static void InitStates();
+	static void InitStates()
+	{
+		for (std::vector<BehaviourCustomState*>::iterator it = BehaviourStateObjs.begin(); it != BehaviourStateObjs.end(); it++)
+		{
+			BehaviourCustomState* ref = *it;
+			ref->ConstructState(States);
+		}
+	}
 	static BehaviourState& GetState(const std::string& StateName);
 private:
 	std::vector<BehaviourTree> trees;
