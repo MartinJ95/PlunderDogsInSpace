@@ -97,3 +97,5 @@ struct EmptyState : public BehaviourCustomState
 
 constexpr AIFindingTarget AIFindingTargetObj;
 constexpr ShootAtTarget ShootAtTargetObj;
+constexpr FindTargetMoveLocation FindTargetLocationObj;
+constexpr EmptyState EmptyStateObj;

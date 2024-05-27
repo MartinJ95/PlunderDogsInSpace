@@ -8,6 +8,21 @@ Sandbox::Sandbox() : Application(), team1(glm::vec3(0.f, 0.f, 0.f), false), team
 
 bool Sandbox::Init()
 {
+    auto stateObjInits = [](std::vector<BehaviourCustomState*>&& objs)
+        {
+            for (std::vector<BehaviourCustomState*>::iterator it = objs.begin(); it != objs.end(); it++)
+            {
+                BehaviourStateObjs.emplace_back(*it);
+            }
+        };
+
+    stateObjInits(std::move(std::vector<BehaviourCustomState*>{
+        (BehaviourCustomState*)&EmptyStateObj,
+        (BehaviourCustomState*)&FindTargetLocationObj,
+        (BehaviourCustomState*)&AIFindingTargetObj,
+        (BehaviourCustomState*)&ShootAtTargetObj
+    }));
+
     team1.Init(&team2);
     team2.Init(&team1);
     testPlanet.m_transform.SetPosition(glm::vec3(0.f, -10.f, -5.f));
