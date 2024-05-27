@@ -108,7 +108,7 @@ void BehaviourState::InitStates()
 
 BehaviourState& BehaviourState::GetState(const std::string& StateName)
 {
-    std::unordered_map<std::string, BehaviourState>::iterator state;
+    std::unordered_map<std::string, BehaviourState>::iterator state = States.begin();
     state = States.find(StateName);
 
     assert((state != States.end()));
