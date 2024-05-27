@@ -62,7 +62,8 @@ void Ship::Init(Team* OwningTeam)
 	{
 		m_behaviourStates.movementDecisionMaking = &BehaviourState::GetState("set move to location");
 	}
-	m_behaviourStates.movement = &BehaviourState::GetState("moving to location");
+	//m_behaviourStates.movement = &BehaviourState::GetState("moving to location");
+	m_behaviourStates.movement = &BehaviourState::GetState("fighter move to location");
 	m_behaviourStates.engaging = &BehaviourState::GetState("shooting at target");
 
 	/*m_tree.GetRoot()->AddChild(std::move(new BTDecoratorNode(&BTShipFindTargetObj)));

@@ -21,7 +21,8 @@ bool Sandbox::Init()
         (BehaviourCustomState*)&FindTargetLocationObj,
         (BehaviourCustomState*)&AIFindingTargetObj,
         (BehaviourCustomState*)&ShootAtTargetObj,
-        (BehaviourCustomState*)&MoveToTargetLocationObj
+        (BehaviourCustomState*)&MoveToTargetLocationObj,
+        (BehaviourCustomState*)&FighterMoveToTartetLocationObj
     }));
 
     BehaviourState::InitStates();

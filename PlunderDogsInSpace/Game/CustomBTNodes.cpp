@@ -64,6 +64,21 @@ BTNodeResult BTShipSetMoveToLocation::Evaluate(void* ptr) const
 	return BTNodeResult::eBTSuccess;
 }
 
+BTNodeResult BTShipReachedTargetLocation::Evaluate(void* ptr) const
+{
+	if (ptr == nullptr)
+		return BTNodeResult::eBTFail;
+
+	ShipAIData* data = static_cast<ShipAIData*>(ptr);
+
+	if (glm::length(data->targetLocation - data->owner->m_transform.GetPosition()) < 2.f)
+	{
+		return BTNodeResult::eBTSuccess;
+	}
+
+	return BTNodeResult::eBTFail;
+}
+
 BTNodeResult BTShipMoveToLocation::Evaluate(void* ptr) const
 {
 	if (ptr == nullptr)
@@ -278,6 +293,35 @@ void MoveToTargetLocation::ConstructState(std::unordered_map<std::string, Behavi
 	States.emplace(
 		std::pair<std::string, BehaviourState>{
 		std::string("moving to location"),
+			std::move(state)
+	}
+	);
+}
+
+void FighterMoveToTartetLocation::ConstructState(std::unordered_map<std::string, BehaviourState>& States) const
+{
+	BehaviourTree tree(new BTSelectorNode);
+	tree.GetRoot()->AddChild(new BTDecoratorNode( & BTShipReachedTargetLocationObj));
+	tree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipPhysicsMoveForwardObj));
+
+	BehaviourTree rotationTree(new BTSelectorNode);
+	rotationTree.GetRoot()->AddChild(new BTDecoratorNode(&BTShipRotateToTargetLocationObj));
+
+	BehaviourTree PhysicsTree(new BTSelectorNode);
+	PhysicsTree.GetRoot()->AddChild(new BTDecoratorNode( & BTApplyPhysicsObj));
+
+	std::vector<BehaviourTree> trees;
+	trees.reserve(3);
+
+	trees.emplace_back(std::move(tree));
+	trees.emplace_back(std::move(rotationTree));
+	trees.emplace_back(std::move(PhysicsTree));
+
+	BehaviourState state{ std::move(trees) };
+
+	States.emplace(
+		std::pair<std::string, BehaviourState>{
+		std::string("fighter move to location"),
 			std::move(state)
 	}
 	);

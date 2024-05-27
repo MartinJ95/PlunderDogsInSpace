@@ -11,6 +11,11 @@ struct BTShipSetMoveToLocation : public BTAction
 	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
 };
 
+struct BTShipReachedTargetLocation : public BTAction
+{
+	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
+};
+
 struct BTShipMoveToLocation : public BTAction
 {
 	virtual BTNodeResult Evaluate(void* ptr = nullptr) const override;
@@ -67,8 +72,12 @@ constexpr BTShipMoveToLocation BTShipMoveToLocationObj;
 constexpr BTShipShootAtTarget BTShipShootAtTargetObj;
 constexpr BTShipLookingAtTarget BTShipLookingAtTargetObj;
 constexpr BTShipRotateToTarget BTShipRotateToTargetObj;
+constexpr BTShipRotateToTargetLocation BTShipRotateToTargetLocationObj;
 constexpr BTSucceed BTSucceedObj;
 constexpr BTHasGotTarget BTHasGotTargetObj;
+constexpr BTShipReachedTargetLocation BTShipReachedTargetLocationObj;
+constexpr BTSetPhysicsMoveForward BTShipPhysicsMoveForwardObj;
+constexpr BTApplyPhysics BTApplyPhysicsObj;
 
 struct AIFindingTarget : public BehaviourCustomState
 {
@@ -81,6 +90,11 @@ struct ShootAtTarget : public BehaviourCustomState
 };
 
 struct MoveToTargetLocation : public BehaviourCustomState
+{
+	virtual void ConstructState(std::unordered_map<std::string, BehaviourState>& States) const override final;
+};
+
+struct FighterMoveToTartetLocation : public BehaviourCustomState
 {
 	virtual void ConstructState(std::unordered_map<std::string, BehaviourState>& States) const override final;
 };
@@ -100,3 +114,4 @@ constexpr ShootAtTarget ShootAtTargetObj;
 constexpr FindTargetMoveLocation FindTargetLocationObj;
 constexpr EmptyState EmptyStateObj;
 constexpr MoveToTargetLocation MoveToTargetLocationObj;
+constexpr FighterMoveToTartetLocation FighterMoveToTartetLocationObj;
