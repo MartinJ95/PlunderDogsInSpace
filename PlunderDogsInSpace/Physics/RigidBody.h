@@ -42,6 +42,8 @@ public:
 	void SetForce(const glm::vec3& NewForce);
 	void AddForce(const glm::vec3& AddedForce);
 	void SubtractForce(const glm::vec3& SubtractedForce);
+	void SetMass(const float NewMass);
+	float GetMass() const;
 private:
 	inline glm::vec3 GetVelocityChange(const float DeltaTime) const;
 	inline glm::vec3 ApplyRotation(const glm::vec3& VelocityChange, Transform& T);

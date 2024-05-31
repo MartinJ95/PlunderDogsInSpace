@@ -31,6 +31,16 @@ void RigidBody::SubtractForce(const glm::vec3& SubtractedForce)
 	m_force -= SubtractedForce;
 }
 
+void RigidBody::SetMass(const float NewMass)
+{
+	m_mass = NewMass;
+}
+
+float RigidBody::GetMass() const
+{
+	return m_mass;
+}
+
 inline glm::vec3 RigidBody::GetVelocityChange(const float DeltaTime) const
 {
 	glm::vec3 acceleration = (m_force + m_constantForce) / m_mass;
