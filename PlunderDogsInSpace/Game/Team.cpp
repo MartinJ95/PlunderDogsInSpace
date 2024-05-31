@@ -179,6 +179,7 @@ void Team::Init(Team* Other)
 		m_ships.back().EndOfFrame();
 		m_ships.back().GetShipAIData().targetLocation = m_ships.back().m_transform.GetPosition();
 		m_ships.back().SetClass((i % 2 == 0 ? Fighter : Cruiser));
+		m_ships.back().m_body.SetMass(10.f);
 		//m_ships.back().SetWeapon((i % 2 == 0 ? DefaultGun : DefaultCannon));
 	}
 }
