@@ -140,6 +140,8 @@ inline void RotateTowardsPoint(const glm::vec3& TargetPoint, Transform& ShipTran
 
 	float angleBetween = glm::acos(glm::dot(glm::normalize(toTargetPoint), ShipTransform.GetForwardVector()));
 
+	//angleBetween = fmax(angleBetween, 1.f);
+
 	glm::quat newRot = ShipTransform.GetRotation() * glm::quat(glm::vec3(0, rightSide ? angleBetween : -angleBetween, 0));
 
 	if (newRot != newRot)

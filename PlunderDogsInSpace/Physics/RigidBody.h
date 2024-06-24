@@ -21,6 +21,11 @@ public:
 	}
 	glm::vec3 GetForwardVector() const
 	{
+		glm::quat q = glm::quat(0, 0, 0, 1);
+		glm::quat rotator = rotation;
+		q = q * rotation;
+		q = q * glm::conjugate(rotator);
+		//return glm::vec3(q.x, q.y, q.z);
 		return glm::vec3(0, 0, 1) * rotation;
 	}
 private:

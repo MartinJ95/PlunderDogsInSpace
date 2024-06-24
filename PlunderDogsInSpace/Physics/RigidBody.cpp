@@ -7,7 +7,7 @@ RigidBody::RigidBody() : m_velocity(glm::vec3(0.f)), m_force(glm::vec3(0.f)), m_
 void RigidBody::ApplyPhysics(const float DeltaTime, Transform& T)
 {
 	glm::vec3 VelocityChange = GetVelocityChange(DeltaTime);
-	ApplyRotation(VelocityChange, T);
+	//ApplyRotation(VelocityChange, T);
 
 	m_velocity += VelocityChange;
 
